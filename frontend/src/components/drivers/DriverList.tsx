@@ -126,20 +126,14 @@ export const DriverList: React.FC<DriverListProps> = ({
       key: 'experienceYears',
       render: (years) => `${years} лет`,
     },
-    {
+{
       title: 'Статус',
       dataIndex: 'status',
       key: 'status',
       render: (status: DriverStatus) => (
         <Tag color={statusColors[status]}>{statusLabels[status]}</Tag>
       ),
-      filters: [
-        { text: 'Активен', value: 'active' },
-        { text: 'Неактивен', value: 'inactive' },
-        { text: 'Заблокирован', value: 'blocked' },
-      ],
-    },
-    {
+    },    {
       title: 'Действия',
       key: 'actions',
       render: (_, record) => (
@@ -151,13 +145,12 @@ export const DriverList: React.FC<DriverListProps> = ({
           >
             Редактировать
           </Button>
-          <Popconfirm
+<Popconfirm
             title="Вы уверены, что хотите удалить этого водителя?"
             onConfirm={() => handleDelete(record.id)}
-            okText="Да"
-            cancelText="Нет"
-          >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            okText="Ок"
+            cancelText="Отмена"
+          >            <Button type="link" danger icon={<DeleteOutlined />}>
               Удалить
             </Button>
           </Popconfirm>

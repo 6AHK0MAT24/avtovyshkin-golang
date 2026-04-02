@@ -56,17 +56,31 @@ func SaveFileFromBytes(data []byte, filename, uploadDir string) (string, error) 
 		return "", fmt.Errorf("failed to write file: %w", err)
 	}
 
-	// Return relative path
-	return strings.ReplaceAll(filePath, "\\", "/"), nil
-}
+	// Return relative path without ./ prefix
+	relativePath := strings.ReplaceAll(filePath, "\\", "/")
+	// Remove ./ prefix if present
+	if strings.HasPrefix(relativePath, "./") {
+		relativePath = "/" + strings.TrimPrefix(relativePath, "./")
+	} else if !strings.HasPrefix(relativePath, "/") {
+		relativePath = "/" + relativePath
+	}
 
+	return relativePath, nil
+}
 // DeleteFile deletes file at specified path
 func DeleteFile(filePath string) error {
 	if filePath == "" {
 		return nil
 	}
 
-	if err := os.Remove(filePath); err != nil {
+	// Convert path from /uploads/... to ./uploads/... if needed
+	// The path might be stored as /uploads/photo/abc.jpg but files are in ./uploads/photo/abc.jpg
+	cleanPath := filePath
+	if strings.HasPrefix(cleanPath, "/") {
+		cleanPath = "." + cleanPath
+	}
+
+	if err := os.Remove(cleanPath); err != nil {
 		if os.IsNotExist(err) {
 			return nil // File doesn't exist, that's okay
 		}
@@ -75,7 +89,6 @@ func DeleteFile(filePath string) error {
 
 	return nil
 }
-
 // GenerateUniqueFilename generates unique filename using UUID
 func GenerateUniqueFilename(originalName string) string {
 	ext := filepath.Ext(originalName)

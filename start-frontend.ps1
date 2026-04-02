@@ -1,37 +1,37 @@
-# Скрипт для запуска frontend приложения
+# Script to start frontend application
 
-Write-Host "Запуск Frontend приложения..." -ForegroundColor Green
+Write-Host "Starting Frontend application..." -ForegroundColor Green
 
-# Переходим в директорию frontend
+# Change to frontend directory
 $frontendDir = "frontend"
 if (-not (Test-Path $frontendDir)) {
-    Write-Host "Ошибка: Директория $frontendDir не найдена!" -ForegroundColor Red
+    Write-Host "Error: Directory $frontendDir not found!" -ForegroundColor Red
     exit 1
 }
 
 Set-Location $frontendDir
 
-# Проверяем, установлены ли зависимости
+# Check if dependencies are installed
 if (-not (Test-Path "node_modules")) {
-    Write-Host "Установка зависимостей..." -ForegroundColor Yellow
+    Write-Host "Installing dependencies..." -ForegroundColor Yellow
     yarn install
 }
 
-# Проверяем порт 5173
+# Check port 5173
 $portInUse = netstat -ano | Select-String ":5173" | Select-String "LISTENING"
 if ($portInUse) {
-    Write-Host "Внимание: Порт 5173 уже используется. Попытка освободить..." -ForegroundColor Yellow
+    Write-Host "Warning: Port 5173 is already in use. Attempting to free it..." -ForegroundColor Yellow
     $pid = ($portInUse -split '\s+')[-1]
     try {
         taskkill /F /PID $pid | Out-Null
-        Write-Host "Порт 5173 освобожден." -ForegroundColor Green
+        Write-Host "Port 5173 freed." -ForegroundColor Green
     } catch {
-        Write-Host "Не удалось освободить порт 5173. Пожалуйста, остановите процесс вручную." -ForegroundColor Red
+        Write-Host "Failed to free port 5173. Please stop the process manually." -ForegroundColor Red
         exit 1
     }
 }
 
-# Запускаем frontend
-Write-Host "Запуск dev сервера на порту 5173..." -ForegroundColor Cyan
-Write-Host "Frontend будет доступен по адресу: http://localhost:5173" -ForegroundColor Green
+# Start frontend
+Write-Host "Starting dev server on port 5173..." -ForegroundColor Cyan
+Write-Host "Frontend will be available at: http://localhost:5173" -ForegroundColor Green
 yarn dev

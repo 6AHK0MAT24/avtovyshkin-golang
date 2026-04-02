@@ -17,12 +17,17 @@ export const DriverSearch: React.FC<DriverSearchProps> = ({ onSearch, onClear })
     onSearch(query, status);
   };
 
+  const handleStatusChange = (value: DriverStatus | undefined) => {
+    setStatus(value);
+    // Автоматически запускаем поиск при изменении статуса
+    onSearch(query, value);
+  };
+
   const handleClear = () => {
     setQuery('');
     setStatus(undefined);
     onClear();
   };
-
   return (
     <Card style={{ marginBottom: 16 }}>
       <Space size="middle" style={{ width: '100%' }}>
@@ -33,14 +38,13 @@ export const DriverSearch: React.FC<DriverSearchProps> = ({ onSearch, onClear })
           onPressEnter={handleSearch}
           style={{ width: 300 }}
         />
-        <Select
+<Select
           placeholder="Статус"
           value={status}
-          onChange={setStatus}
+          onChange={handleStatusChange}
           style={{ width: 150 }}
           allowClear
-        >
-          <Option value="active">Активен</Option>
+        >          <Option value="active">Активен</Option>
           <Option value="inactive">Неактивен</Option>
           <Option value="blocked">Заблокирован</Option>
         </Select>

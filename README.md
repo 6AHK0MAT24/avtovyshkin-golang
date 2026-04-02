@@ -76,6 +76,30 @@ docker-compose down
 
 ### Локальная разработка
 
+#### Рекомендуемый режим разработки (PostgreSQL в Docker + Hot Reload)
+
+Для локальной разработки рекомендуется использовать PostgreSQL в Docker с hot reload для бэкенда:
+
+```powershell
+# 1. Запуск PostgreSQL в Docker
+.\start-dev.ps1
+
+# 2. Запуск бэкенда с hot reload (в новом терминале)
+.\start-backend.ps1
+
+# 3. Запуск фронтенда (в новом терминале)
+.\start-frontend.ps1
+
+# Остановка PostgreSQL
+.\stop-dev.ps1
+```
+
+**Преимущества этого режима:**
+- ✅ PostgreSQL работает в Docker (изолирован и легко управляем)
+- ✅ Бэкенд запускается локально с hot reload (изменения применяются автоматически)
+- ✅ Быстрый цикл разработки без пересборки Docker контейнеров
+- ✅ Полный доступ к отладке и логам
+
 #### Быстрый запуск с PowerShell скриптами
 
 Для удобного запуска проекта используйте готовые скрипты:
@@ -106,8 +130,15 @@ cd backend/drivers-microservice
 # Установка зависимостей
 go mod download
 
-# Запуск
+# Установка air для hot reload (опционально)
+go install github.com/cosmtrek/air@latest
+
+# Запуск с hot reload
+air
+
+# Или обычный запуск
 go run cmd/server/main.go
+```
 ```
 
 **Frontend**
