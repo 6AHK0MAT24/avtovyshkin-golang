@@ -290,8 +290,8 @@ func (s *driverService) UploadDriverPhoto(ctx context.Context, id uuid.UUID, fil
 		return "", fmt.Errorf("failed to get driver: %w", err)
 	}
 
-	// Use shared photo directory
-	photoDir := "./uploads/photo"
+	// Use driver-specific photo directory
+	photoDir := "./uploads/drivers/photo"
 
 	// Delete old photo if exists
 	if driver.Photo != nil {
@@ -303,7 +303,7 @@ func (s *driverService) UploadDriverPhoto(ctx context.Context, id uuid.UUID, fil
 	// Generate unique filename using UUID
 	uniqueFilename := utils.GenerateUniqueFilename(filename)
 
-	// Save new photo to shared directory
+	// Save new photo to driver-specific directory
 	filePath, err := utils.SaveFileFromBytes(fileData, uniqueFilename, photoDir)
 	if err != nil {
 		return "", fmt.Errorf("failed to save photo: %w", err)
@@ -313,27 +313,23 @@ func (s *driverService) UploadDriverPhoto(ctx context.Context, id uuid.UUID, fil
 	driver.Photo = &filePath
 	driver.UpdatedAt = time.Now()
 	if err := s.repo.Update(ctx, driver); err != nil {
-		// Rollback: delete uploaded file
+	// Rollback: delete uploaded file
 		utils.DeleteFile(filePath)
 		return "", fmt.Errorf("failed to update driver: %w", err)
 	}
 
 	return filePath, nil
 }
-
 // UploadDriverLicense uploads driver license document
-func (s *driverService) UploadDriverLicense(ctx context.Context, id uuid.UUID, fileData []byte, filename string, fileType string) (string, error) {	// Get driver
+func (s *driverService) UploadDriverLicense(ctx context.Context, id uuid.UUID, fileData []byte, filename string, fileType string) (string, error) {
+	// Get driver
 	driver, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return "", fmt.Errorf("failed to get driver: %w", err)
 	}
 
-	// Create driver directories
-	uploadDir := "./uploads"
-	_, licenseDir, _, err := utils.CreateDriverDirectories(uploadDir, driver.ID.String())
-	if err != nil {
-		return "", fmt.Errorf("failed to create directories: %w", err)
-	}
+	// Use shared license directory
+	licenseDir := "./uploads/drivers/license"
 
 	// Delete old file if exists
 	var oldFilePath *string
@@ -349,8 +345,11 @@ func (s *driverService) UploadDriverLicense(ctx context.Context, id uuid.UUID, f
 		}
 	}
 
+	// Generate unique filename
+	uniqueFilename := utils.GenerateUniqueFilename(filename)
+
 	// Save new file
-	filePath, err := utils.SaveFileFromBytes(fileData, filename, licenseDir)
+	filePath, err := utils.SaveFileFromBytes(fileData, uniqueFilename, licenseDir)
 	if err != nil {
 		return "", fmt.Errorf("failed to save file: %w", err)
 	}
@@ -371,7 +370,6 @@ func (s *driverService) UploadDriverLicense(ctx context.Context, id uuid.UUID, f
 
 	return filePath, nil
 }
-
 // UploadDriverPassport uploads driver passport document
 func (s *driverService) UploadDriverPassport(ctx context.Context, id uuid.UUID, fileData []byte, filename string, fileType string) (string, error) {
 	// Get driver
@@ -380,12 +378,8 @@ func (s *driverService) UploadDriverPassport(ctx context.Context, id uuid.UUID, 
 		return "", fmt.Errorf("failed to get driver: %w", err)
 	}
 
-	// Create driver directories
-	uploadDir := "./uploads"
-	_, _, passportDir, err := utils.CreateDriverDirectories(uploadDir, driver.ID.String())
-	if err != nil {
-		return "", fmt.Errorf("failed to create directories: %w", err)
-	}
+	// Use shared passport directory
+	passportDir := "./uploads/drivers/passport"
 
 	// Delete old file if exists
 	var oldFilePath *string
@@ -401,8 +395,11 @@ func (s *driverService) UploadDriverPassport(ctx context.Context, id uuid.UUID, 
 		}
 	}
 
+	// Generate unique filename
+	uniqueFilename := utils.GenerateUniqueFilename(filename)
+
 	// Save new file
-	filePath, err := utils.SaveFileFromBytes(fileData, filename, passportDir)
+	filePath, err := utils.SaveFileFromBytes(fileData, uniqueFilename, passportDir)
 	if err != nil {
 		return "", fmt.Errorf("failed to save file: %w", err)
 	}
@@ -423,7 +420,6 @@ func (s *driverService) UploadDriverPassport(ctx context.Context, id uuid.UUID, 
 
 	return filePath, nil
 }
-
 // DeleteDriverPhoto deletes a driver's photo
 func (s *driverService) DeleteDriverPhoto(ctx context.Context, id uuid.UUID) error {
 	// Get driver

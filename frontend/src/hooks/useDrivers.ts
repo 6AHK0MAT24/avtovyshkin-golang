@@ -75,8 +75,8 @@ export const useUploadDriverLicense = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) =>
-      driverService.uploadDriverLicense(id, file),
+    mutationFn: ({ id, file, fileType }: { id: string; file: File; fileType: 'photo' | 'scan' }) =>
+      driverService.uploadDriverLicense(id, file, fileType),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['driver', variables.id] });
     },
@@ -87,14 +87,13 @@ export const useUploadDriverPassport = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) =>
-      driverService.uploadDriverPassport(id, file),
+    mutationFn: ({ id, file, fileType }: { id: string; file: File; fileType: 'photo' | 'scan' }) =>
+      driverService.uploadDriverPassport(id, file, fileType),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['driver', variables.id] });
     },
   });
 };
-
 export const useDeleteDriverPhoto = () => {
   const queryClient = useQueryClient();
 

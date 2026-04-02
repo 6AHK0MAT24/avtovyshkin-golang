@@ -54,22 +54,23 @@ export const driverService = {
     return response.data;
   },
 
-  // Upload driver license
-  uploadDriverLicense: async (id: string, file: File): Promise<FileUploadResponse> => {
+// Upload driver license
+  uploadDriverLicense: async (id: string, file: File, fileType: 'photo' | 'scan'): Promise<FileUploadResponse> => {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('fileType', fileType);
     const response = await apiClient.upload<FileUploadResponse>(`/drivers/${id}/license`, formData);
     return response.data;
   },
 
   // Upload driver passport
-  uploadDriverPassport: async (id: string, file: File): Promise<FileUploadResponse> => {
+  uploadDriverPassport: async (id: string, file: File, fileType: 'photo' | 'scan'): Promise<FileUploadResponse> => {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('fileType', fileType);
     const response = await apiClient.upload<FileUploadResponse>(`/drivers/${id}/passport`, formData);
     return response.data;
   },
-
   // Delete driver photo
   deleteDriverPhoto: async (id: string): Promise<void> => {
     await apiClient.delete(`/drivers/${id}/photo`);

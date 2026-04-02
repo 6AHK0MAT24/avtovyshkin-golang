@@ -298,7 +298,7 @@ func (h *DriverHandler) UploadDriverLicense(w http.ResponseWriter, r *http.Reque
 	defer file.Close()
 
 	// Get file type (photo or scan)
-	fileType := r.FormValue("type")
+	fileType := r.FormValue("fileType")
 	if fileType != "photo" && fileType != "scan" {
 		http.Error(w, "Invalid file type", http.StatusBadRequest)
 		return
@@ -339,7 +339,6 @@ func (h *DriverHandler) UploadDriverLicense(w http.ResponseWriter, r *http.Reque
 
 	respondJSON(w, http.StatusOK, response)
 }
-
 // UploadDriverPassport handles POST /api/drivers/{id}/passport
 func (h *DriverHandler) UploadDriverPassport(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/drivers/")
@@ -364,7 +363,7 @@ func (h *DriverHandler) UploadDriverPassport(w http.ResponseWriter, r *http.Requ
 	defer file.Close()
 
 	// Get file type (photo or scan)
-	fileType := r.FormValue("type")
+	fileType := r.FormValue("fileType")
 	if fileType != "photo" && fileType != "scan" {
 		http.Error(w, "Invalid file type", http.StatusBadRequest)
 		return
@@ -405,7 +404,6 @@ func (h *DriverHandler) UploadDriverPassport(w http.ResponseWriter, r *http.Requ
 
 	respondJSON(w, http.StatusOK, response)
 }
-
 // DeleteDriverPhoto handles DELETE /api/drivers/{id}/photo
 func (h *DriverHandler) DeleteDriverPhoto(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/drivers/")

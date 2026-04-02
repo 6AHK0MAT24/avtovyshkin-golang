@@ -115,18 +115,32 @@ export const DriverList: React.FC<DriverListProps> = ({
       key: 'email',
       render: (email) => email || '-',
     },
-    {
+{
       title: '№ ВУ',
       dataIndex: 'driverLicenseNumber',
       key: 'driverLicenseNumber',
+    },
+    {
+      title: 'Срок действия ВУ',
+      dataIndex: 'driverLicenseExpiryDate',
+      key: 'driverLicenseExpiryDate',
+      render: (date) => date ? new Date(date).toLocaleDateString('ru-RU') : '-',
+    },
+    {
+      title: 'Паспорт',
+      dataIndex: 'passportSeries',
+      key: 'passport',
+      render: (_, record) =>
+        record.passportSeries && record.passportNumber
+          ? `${record.passportSeries} ${record.passportNumber}`
+          : '-',
     },
     {
       title: 'Стаж',
       dataIndex: 'experienceYears',
       key: 'experienceYears',
       render: (years) => `${years} лет`,
-    },
-{
+    },{
       title: 'Статус',
       dataIndex: 'status',
       key: 'status',

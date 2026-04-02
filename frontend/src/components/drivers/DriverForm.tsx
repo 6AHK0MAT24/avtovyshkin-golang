@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, InputNumber, DatePicker, Select, Button, Space, message, Upload, Image } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { useCreateDriver, useUpdateDriver, useUploadDriverPhoto, useDeleteDriverPhoto } from '../../hooks/useDrivers';
+import {
+  useCreateDriver,
+  useUpdateDriver,
+  useUploadDriverPhoto,
+  useDeleteDriverPhoto,
+  useUploadDriverLicense,
+  useUploadDriverPassport,
+} from '../../hooks/useDrivers';
 import type { Driver, CreateDriverRequest, UpdateDriverRequest } from '../../types/driver';
 import type { UploadFile } from 'antd/es/upload/interface';
 const { Option } = Select;
@@ -19,14 +26,21 @@ export const DriverForm: React.FC<DriverFormProps> = ({ driver, onSuccess, onCan
   const updateDriver = useUpdateDriver();
   const uploadPhoto = useUploadDriverPhoto();
   const deletePhoto = useDeleteDriverPhoto();
+  const uploadLicense = useUploadDriverLicense();
+  const uploadPassport = useUploadDriverPassport();
+
   const [photoUrl, setPhotoUrl] = useState<string | undefined>(driver?.photo);
+  const [licenseScanUrl, setLicenseScanUrl] = useState<string | undefined>(driver?.driverLicenseScan);
+  const [passportScanUrl, setPassportScanUrl] = useState<string | undefined>(driver?.passportScan);
+
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [tempPhotoFile, setTempPhotoFile] = useState<File | null>(null);
 
   const isEdit = !!driver;
 
-  useEffect(() => {    if (driver) {
+  useEffect(() => {
+    if (driver) {
       form.setFieldsValue({
         ...driver,
         birthDate: driver.birthDate ? dayjs(driver.birthDate) : null,
@@ -35,8 +49,11 @@ export const DriverForm: React.FC<DriverFormProps> = ({ driver, onSuccess, onCan
         passportIssueDate: driver.passportIssueDate ? dayjs(driver.passportIssueDate) : null,
       });
       setPhotoUrl(driver.photo);
+      setLicenseScanUrl(driver.driverLicenseScan);
+      setPassportScanUrl(driver.passportScan);
     }
   }, [driver, form]);
+
   const handlePhotoChange = (info: any) => {
     const { file } = info;
 
@@ -64,6 +81,7 @@ export const DriverForm: React.FC<DriverFormProps> = ({ driver, onSuccess, onCan
     setTempPhotoFile(null);
     form.setFieldValue('photo', undefined);
   };
+
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
@@ -79,32 +97,51 @@ export const DriverForm: React.FC<DriverFormProps> = ({ driver, onSuccess, onCan
   };
 
   const customRequest = async (options: any) => {
-    const { file, onSuccess, onError } = options;
+    const { file, onSuccess, onError, type } = options;
 
     if (isEdit && driver) {
       try {
         setUploading(true);
-        const result = await uploadPhoto.mutateAsync({ id: driver.id, file });
-        setPhotoUrl(result.filePath);
-        form.setFieldValue('photo', result.filePath);
+        let result;
+
+        if (type === 'licenseScan') {
+          result = await uploadLicense.mutateAsync({ id: driver.id, file, fileType: 'scan' });
+          setLicenseScanUrl(result.filePath);
+          form.setFieldValue('driverLicenseScan', result.filePath);
+        } else if (type === 'passportScan') {
+          result = await uploadPassport.mutateAsync({ id: driver.id, file, fileType: 'scan' });
+          setPassportScanUrl(result.filePath);
+          form.setFieldValue('passportScan', result.filePath);
+        } else {
+          result = await uploadPhoto.mutateAsync({ id: driver.id, file });
+          setPhotoUrl(result.filePath);
+          form.setFieldValue('photo', result.filePath);
+        }
+
         onSuccess(result);
-        message.success('Фото успешно загружено');
+        message.success('Файл успешно загружен');
       } catch (error) {
-        message.error('Ошибка при загрузке фото');
+        message.error('Ошибка при загрузке файла');
         onError(error);
       } finally {
         setUploading(false);
       }
     } else {
       // При создании водителя сохраняем файл временно
-      setTempPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhotoUrl(reader.result as string);
+        if (type === 'licenseScan') {
+          setLicenseScanUrl(reader.result as string);
+        } else if (type === 'passportScan') {
+          setPassportScanUrl(reader.result as string);
+        } else {
+          setTempPhotoFile(file);
+          setPhotoUrl(reader.result as string);
+        }
       };
       reader.readAsDataURL(file);
       onSuccess(file);
-      message.success('Фото выбрано');
+      message.success('Файл выбран');
     }
   };
 
@@ -146,7 +183,9 @@ export const DriverForm: React.FC<DriverFormProps> = ({ driver, onSuccess, onCan
     } catch (error) {
       message.error(isEdit ? 'Ошибка при обновлении водителя' : 'Ошибка при создании водителя');
     }
-  };  return (
+  };
+
+  return (
     <Form
       form={form}
       layout="vertical"
@@ -246,9 +285,12 @@ export const DriverForm: React.FC<DriverFormProps> = ({ driver, onSuccess, onCan
                 {uploading ? 'Загрузка...' : 'Загрузить'}
               </div>
             </div>
-          </Upload>        </div>
+          </Upload>
+        </div>
       </Form.Item>
-      <Form.Item        label="Телефон"
+
+      <Form.Item
+        label="Телефон"
         name="phone"
         rules={[
           { required: true, message: 'Введите телефон' },
@@ -294,6 +336,46 @@ export const DriverForm: React.FC<DriverFormProps> = ({ driver, onSuccess, onCan
         <DatePicker style={{ width: '100%' }} />
       </Form.Item>
 
+      <Form.Item label="Скан водительских прав">
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+          {licenseScanUrl ? (
+            <div style={{ position: 'relative' }}>
+              <Image
+                src={licenseScanUrl.startsWith('data:') ? licenseScanUrl : `http://localhost:8080${licenseScanUrl}`}
+                alt="Скан прав"
+                width={120}
+                height={120}
+                style={{ objectFit: 'cover', borderRadius: 8 }}
+                preview={{ mask: 'Просмотр' }}
+              />
+            </div>
+          ) : (
+            <div style={{
+              width: 120, height: 120, borderRadius: 8, backgroundColor: '#f0f0f0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, color: '#999', border: '2px dashed #d9d9d9'
+            }}>
+              Нет скана
+            </div>
+          )}
+          <Upload
+            listType="picture-card"
+            fileList={[]}
+            beforeUpload={beforeUpload}
+            customRequest={(options) => customRequest({ ...options, type: 'licenseScan' })}
+            maxCount={1}
+            accept="image/*"
+            showUploadList={false}
+            disabled={uploading}
+          >
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>{uploading ? 'Загрузка...' : 'Загрузить скан'}</div>
+            </div>
+          </Upload>
+        </div>
+      </Form.Item>
+
       <Form.Item label="Серия паспорта" name="passportSeries">
         <Input placeholder="1234" maxLength={4} />
       </Form.Item>
@@ -304,6 +386,46 @@ export const DriverForm: React.FC<DriverFormProps> = ({ driver, onSuccess, onCan
 
       <Form.Item label="Дата выдачи паспорта" name="passportIssueDate">
         <DatePicker style={{ width: '100%' }} />
+      </Form.Item>
+
+      <Form.Item label="Скан паспорта">
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+          {passportScanUrl ? (
+            <div style={{ position: 'relative' }}>
+              <Image
+                src={passportScanUrl.startsWith('data:') ? passportScanUrl : `http://localhost:8080${passportScanUrl}`}
+                alt="Скан паспорта"
+                width={120}
+                height={120}
+                style={{ objectFit: 'cover', borderRadius: 8 }}
+                preview={{ mask: 'Просмотр' }}
+              />
+            </div>
+          ) : (
+            <div style={{
+              width: 120, height: 120, borderRadius: 8, backgroundColor: '#f0f0f0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, color: '#999', border: '2px dashed #d9d9d9'
+            }}>
+              Нет скана
+            </div>
+          )}
+          <Upload
+            listType="picture-card"
+            fileList={[]}
+            beforeUpload={beforeUpload}
+            customRequest={(options) => customRequest({ ...options, type: 'passportScan' })}
+            maxCount={1}
+            accept="image/*"
+            showUploadList={false}
+            disabled={uploading}
+          >
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>{uploading ? 'Загрузка...' : 'Загрузить скан'}</div>
+            </div>
+          </Upload>
+        </div>
       </Form.Item>
 
       <Form.Item label="Адрес" name="address">
