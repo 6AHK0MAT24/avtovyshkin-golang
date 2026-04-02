@@ -126,16 +126,14 @@ export const DriversPage: React.FC = () => {
 
   return (
     <div>
-      <DriverSearch onSearch={handleSearch} onClear={handleClearSearch} />
+      <DriverSearch onSearch={handleSearch} onClear={handleClearSearch} onCreate={handleCreate} />
 
       <DriverList
-        onCreate={handleCreate}
         onEdit={handleEdit}
         onView={handleView}
         searchQuery={searchQuery}
         searchStatus={searchStatus}
       />
-
       {/* Модальное окно создания/редактирования */}
       <Modal
         title={viewMode === 'create' ? 'Создание водителя' : 'Редактирование водителя'}

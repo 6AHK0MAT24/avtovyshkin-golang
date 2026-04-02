@@ -9,7 +9,9 @@ import (
 	"drivers-service/internal/repository"
 	"drivers-service/internal/utils"
 	"github.com/google/uuid"
-)// DriverService defines interface for driver business logic
+)
+
+// DriverService defines interface for driver business logic
 type DriverService interface {
 	CreateDriver(ctx context.Context, req *models.CreateDriverRequest) (*models.Driver, error)
 	GetDriver(ctx context.Context, id uuid.UUID) (*models.Driver, error)
@@ -21,8 +23,9 @@ type DriverService interface {
 	UploadDriverLicense(ctx context.Context, id uuid.UUID, fileData []byte, filename string, fileType string) (string, error)
 	UploadDriverPassport(ctx context.Context, id uuid.UUID, fileData []byte, filename string, fileType string) (string, error)
 	DeleteDriverPhoto(ctx context.Context, id uuid.UUID) error
-}
-// driverService implements DriverService interface
+	DeleteDriverLicense(ctx context.Context, id uuid.UUID) error
+	DeleteDriverPassport(ctx context.Context, id uuid.UUID) error
+}// driverService implements DriverService interface
 type driverService struct {
 	repo repository.DriverRepository
 }
@@ -440,6 +443,64 @@ func (s *driverService) DeleteDriverPhoto(ctx context.Context, id uuid.UUID) err
 
 	// Update driver to remove photo reference
 	driver.Photo = nil
+	driver.UpdatedAt = time.Now()
+
+if err := s.repo.Update(ctx, driver); err != nil {
+		return fmt.Errorf("failed to update driver: %w", err)
+	}
+
+	return nil
+}
+
+// DeleteDriverLicense deletes a driver's license scan
+func (s *driverService) DeleteDriverLicense(ctx context.Context, id uuid.UUID) error {
+	// Get driver
+	driver, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to get driver: %w", err)
+	}
+
+	// Check if driver has a license scan
+	if driver.DriverLicenseScan == nil {
+		return fmt.Errorf("driver has no license scan")
+	}
+
+	// Delete file from disk
+	if err := utils.DeleteFile(*driver.DriverLicenseScan); err != nil {
+		return fmt.Errorf("failed to delete license scan file: %w", err)
+	}
+
+	// Update driver to remove license scan reference
+	driver.DriverLicenseScan = nil
+	driver.UpdatedAt = time.Now()
+
+	if err := s.repo.Update(ctx, driver); err != nil {
+		return fmt.Errorf("failed to update driver: %w", err)
+	}
+
+	return nil
+}
+
+// DeleteDriverPassport deletes a driver's passport scan
+func (s *driverService) DeleteDriverPassport(ctx context.Context, id uuid.UUID) error {
+	// Get driver
+	driver, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to get driver: %w", err)
+	}
+
+	// Check if driver has a passport scan
+	if driver.PassportScan == nil {
+		return fmt.Errorf("driver has no passport scan")
+	}
+
+	// Delete file from disk
+	if err := utils.DeleteFile(*driver.PassportScan); err != nil {
+		return fmt.Errorf("failed to delete passport scan file: %w", err)
+	}
+
+	// Update driver to remove passport scan reference
+	driver.PassportScan = nil
 	driver.UpdatedAt = time.Now()
 
 	if err := s.repo.Update(ctx, driver); err != nil {

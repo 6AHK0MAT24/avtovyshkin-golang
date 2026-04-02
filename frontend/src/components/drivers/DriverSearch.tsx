@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { Input, Select, Button, Space, Card } from 'antd';
-import { SearchOutlined, ClearOutlined } from '@ant-design/icons';
+import { SearchOutlined, ClearOutlined, PlusOutlined } from '@ant-design/icons';
 import type { DriverStatus } from '../../types/driver';
-const { Option } = Select;
 
 interface DriverSearchProps {
   onSearch: (query: string, status?: DriverStatus) => void;
   onClear: () => void;
-}
-
-export const DriverSearch: React.FC<DriverSearchProps> = ({ onSearch, onClear }) => {
+  onCreate?: () => void;
+}export const DriverSearch: React.FC<DriverSearchProps> = ({ onSearch, onClear, onCreate }) => {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<DriverStatus | undefined>();
 
@@ -44,16 +42,22 @@ export const DriverSearch: React.FC<DriverSearchProps> = ({ onSearch, onClear })
           onChange={handleStatusChange}
           style={{ width: 150 }}
           allowClear
-        >          <Option value="active">Активен</Option>
-          <Option value="inactive">Неактивен</Option>
-          <Option value="blocked">Заблокирован</Option>
-        </Select>
-        <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+          options={[
+            { value: 'active', label: 'Активен' },
+            { value: 'inactive', label: 'Неактивен' },
+            { value: 'blocked', label: 'Заблокирован' },
+          ]}
+        />        <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
           Поиск
         </Button>
         <Button icon={<ClearOutlined />} onClick={handleClear}>
           Сбросить
         </Button>
+        {onCreate && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={onCreate} style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}>
+            Добавить водителя
+          </Button>
+        )}
       </Space>
     </Card>
   );

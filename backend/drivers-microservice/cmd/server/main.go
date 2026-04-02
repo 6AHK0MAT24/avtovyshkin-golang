@@ -76,12 +76,13 @@ func main() {
 	api.HandleFunc("/drivers/{id}", driverHandler.UpdateDriver).Methods("PUT", "OPTIONS")
 	api.HandleFunc("/drivers/{id}", driverHandler.DeleteDriver).Methods("DELETE", "OPTIONS")
 
-	// File upload routes
+// File upload routes
 	api.HandleFunc("/drivers/{id}/photo", driverHandler.UploadDriverPhoto).Methods("POST", "OPTIONS")
 	api.HandleFunc("/drivers/{id}/photo", driverHandler.DeleteDriverPhoto).Methods("DELETE", "OPTIONS")
 	api.HandleFunc("/drivers/{id}/license", driverHandler.UploadDriverLicense).Methods("POST", "OPTIONS")
+	api.HandleFunc("/drivers/{id}/license", driverHandler.DeleteDriverLicense).Methods("DELETE", "OPTIONS")
 	api.HandleFunc("/drivers/{id}/passport", driverHandler.UploadDriverPassport).Methods("POST", "OPTIONS")
-
+	api.HandleFunc("/drivers/{id}/passport", driverHandler.DeleteDriverPassport).Methods("DELETE", "OPTIONS")
 	// WebSocket route
 	router.HandleFunc("/ws", wsHandler.HandleWebSocket)
 	// Health check

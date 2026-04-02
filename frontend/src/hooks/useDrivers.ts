@@ -105,3 +105,27 @@ export const useDeleteDriverPhoto = () => {
     },
   });
 };
+
+export const useDeleteDriverLicense = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => driverService.deleteDriverLicense(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['driver', id] });
+      queryClient.invalidateQueries({ queryKey: ['drivers'] });
+    },
+  });
+};
+
+export const useDeleteDriverPassport = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => driverService.deleteDriverPassport(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['driver', id] });
+      queryClient.invalidateQueries({ queryKey: ['drivers'] });
+    },
+  });
+};

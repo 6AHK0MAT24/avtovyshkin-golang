@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { Table, Button, Space, Tag, Popconfirm, message, Image } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useDrivers, useDeleteDriver } from '../../hooks/useDrivers';
 import type { Driver, DriverStatus } from '../../types/driver';
 import type { ColumnsType } from 'antd/es/table';interface DriverListProps {
-  onCreate: () => void;
   onEdit: (driver: Driver) => void;
   onView?: (driver: Driver) => void;
   searchQuery?: string;
   searchStatus?: DriverStatus;
-}
-const statusColors: Record<DriverStatus, string> = {
+}const statusColors: Record<DriverStatus, string> = {
   active: 'green',
   inactive: 'orange',
   blocked: 'red',
@@ -23,13 +21,11 @@ const statusLabels: Record<DriverStatus, string> = {
 };
 
 export const DriverList: React.FC<DriverListProps> = ({
-  onCreate,
   onEdit,
   onView,
   searchQuery = '',
   searchStatus,
-}) => {
-  const [page, setPage] = useState(1);
+}) => {  const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const { data, isLoading, error } = useDrivers(page, pageSize);
@@ -179,11 +175,6 @@ export const DriverList: React.FC<DriverListProps> = ({
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
-          Добавить водителя
-        </Button>
-      </div>
       <Table
         columns={columns}
         dataSource={filteredDrivers}

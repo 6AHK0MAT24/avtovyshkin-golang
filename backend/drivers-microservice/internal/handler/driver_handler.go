@@ -420,9 +420,46 @@ func (h *DriverHandler) DeleteDriverPhoto(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	respondJSON(w, http.StatusOK, map[string]string{"message": "Photo deleted successfully"})
+respondJSON(w, http.StatusOK, map[string]string{"message": "Photo deleted successfully"})
 }
 
+// DeleteDriverLicense handles DELETE /api/drivers/{id}/license
+func (h *DriverHandler) DeleteDriverLicense(w http.ResponseWriter, r *http.Request) {
+	idStr := strings.TrimPrefix(r.URL.Path, "/api/drivers/")
+	idStr = strings.TrimSuffix(idStr, "/license")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		http.Error(w, "Invalid driver ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.service.DeleteDriverLicense(context.Background(), id); err != nil {
+		log.Printf("Error deleting driver license scan: %v", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]string{"message": "License scan deleted successfully"})
+}
+
+// DeleteDriverPassport handles DELETE /api/drivers/{id}/passport
+func (h *DriverHandler) DeleteDriverPassport(w http.ResponseWriter, r *http.Request) {
+	idStr := strings.TrimPrefix(r.URL.Path, "/api/drivers/")
+	idStr = strings.TrimSuffix(idStr, "/passport")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		http.Error(w, "Invalid driver ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.service.DeleteDriverPassport(context.Background(), id); err != nil {
+		log.Printf("Error deleting driver passport scan: %v", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]string{"message": "Passport scan deleted successfully"})
+}
 // respondJSON sends a JSON response
 func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")

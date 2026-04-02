@@ -75,4 +75,14 @@ export const driverService = {
   deleteDriverPhoto: async (id: string): Promise<void> => {
     await apiClient.delete(`/drivers/${id}/photo`);
   },
+
+  // Delete driver license scan
+  deleteDriverLicense: async (id: string): Promise<void> => {
+    await apiClient.delete(`/drivers/${id}/license`);
+  },
+
+  // Delete driver passport scan
+  deleteDriverPassport: async (id: string): Promise<void> => {
+    await apiClient.delete(`/drivers/${id}/passport`);
+  },
 };
