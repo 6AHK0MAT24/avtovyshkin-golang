@@ -4,7 +4,7 @@ import { MenuFoldOutlined, MenuUnfoldOutlined, WifiOutlined, DisconnectOutlined 
 import { useWebSocketStatus } from '../../hooks/useWebSocketStatus';
 
 const { Header: AntHeader } = Layout;
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 interface HeaderProps {
   collapsed: boolean;
@@ -23,16 +23,21 @@ export const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
       padding: '0 24px',
       borderBottom: '1px solid #f0f0f0',
     }}>
-      <Button
-        type="text"
-        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        onClick={onToggle}
-        style={{
-          fontSize: '16px',
-          width: 64,
-          height: 64,
-        }}
-      />
+      <Space size="middle">
+        <Button
+          type="text"
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={onToggle}
+          style={{
+            fontSize: '16px',
+            width: 64,
+            height: 64,
+          }}
+        />
+        <Title level={4} style={{ margin: 0, color: '#1890ff' }}>
+          Автовышкин
+        </Title>
+      </Space>
 
       <Space size="large">
         <Badge

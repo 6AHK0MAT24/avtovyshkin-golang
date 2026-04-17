@@ -68,3 +68,47 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+// Vehicles API client for vehicles microservice (port 8081)
+const VEHICLES_API_BASE_URL = import.meta.env.VITE_VEHICLES_API_BASE_URL || 'http://localhost:8081';
+
+class VehiclesApiClient extends ApiClient {
+  constructor() {
+    super();
+    // Override the client with vehicles-specific configuration
+    this.client = axios.create({
+      baseURL: `${VEHICLES_API_BASE_URL}/api`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Request interceptor
+    this.client.interceptors.request.use(
+      (config: InternalAxiosRequestConfig) => {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error: AxiosError) => {
+        return Promise.reject(error);
+      }
+    );
+
+    // Response interceptor
+    this.client.interceptors.response.use(
+      (response: AxiosResponse) => response,
+      (error: AxiosError) => {
+        if (error.response?.status === 401) {
+          localStorage.removeItem('auth_token');
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
+}
+
+export const vehiclesApiClient = new VehiclesApiClient();

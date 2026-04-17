@@ -3,14 +3,26 @@ export {
   useDriverStore,
   selectDrivers,
   selectCurrentDriver,
-  selectLoading,
-  selectError,
-  selectPagination,
-  selectFilters,
+  selectDriverLoading,
+  selectDriverError,
+  selectDriverPagination,
+  selectDriverFilters,
   selectDriverById,
   selectDriversByStatus,
 } from './driverStore';
 
+// Vehicle Store
+export {
+  useVehicleStore,
+  selectVehicles,
+  selectCurrentVehicle,
+  selectVehicleLoading,
+  selectVehicleError,
+  selectVehiclePagination,
+  selectVehicleFilters,
+  selectVehicleById,
+  selectVehiclesByStatus,
+} from './vehicleStore';
 // UI Store
 export {
   useUIStore,

@@ -4,7 +4,7 @@ import { ConfigProvider } from 'antd';
 import ruRU from 'antd/locale/ru_RU';
 import { Layout as AppLayout } from './components/common/Layout';
 import { DriverNotification } from './components/common/Notification';
-import { DriversPage, RolesPage, UsersPage } from './pages';
+import { DriversPage, RolesPage, UsersPage, VehiclesPage } from './pages';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,6 +26,7 @@ function App() {
               <Route path="/" element={<DriversPage />} />
               <Route path="/roles" element={<RolesPage />} />
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/vehicles" element={<VehiclesPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </AppLayout>

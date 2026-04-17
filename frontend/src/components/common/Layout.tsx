@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Layout as AntLayout, Menu } from 'antd';
-import { CarOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons';
+import { CarOutlined, UserOutlined, TeamOutlined, TruckOutlined } from '@ant-design/icons';
 import { Header } from './Header';
 import { useNavigate, useLocation } from 'react-router-dom';
 const { Sider, Content } = AntLayout;
@@ -18,7 +18,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const menuItems = [
     {
       key: '/',
-      icon: <CarOutlined />,
+      icon: <TruckOutlined />,
       label: 'Водители',
     },
     {
@@ -31,8 +31,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       icon: <UserOutlined />,
       label: 'Пользователи',
     },
+    {
+      key: '/vehicles',
+      icon: <CarOutlined />,
+      label: 'Автовышки',
+    },
   ];
-
   const handleMenuClick = ({ key }: { key: string }) => {
     navigate(key);
   };

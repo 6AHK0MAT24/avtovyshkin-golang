@@ -121,10 +121,10 @@ export const useDriverStore = create<DriverState>((set) => ({
 // Селекторы для оптимизации рендеринга
 export const selectDrivers = (state: DriverState) => state.drivers;
 export const selectCurrentDriver = (state: DriverState) => state.currentDriver;
-export const selectLoading = (state: DriverState) => state.loading;
-export const selectError = (state: DriverState) => state.error;
-export const selectPagination = (state: DriverState) => state.pagination;
-export const selectFilters = (state: DriverState) => state.filters;
+export const selectDriverLoading = (state: DriverState) => state.loading;
+export const selectDriverError = (state: DriverState) => state.error;
+export const selectDriverPagination = (state: DriverState) => state.pagination;
+export const selectDriverFilters = (state: DriverState) => state.filters;
 export const selectDriverById = (id: string) => (state: DriverState) =>
   state.drivers.find((driver) => driver.id === id);
 export const selectDriversByStatus = (status: string) => (state: DriverState) =>

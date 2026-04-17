@@ -127,3 +127,7 @@ class WebSocketClient {
 
 const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:8080';
 export const wsClient = new WebSocketClient(`${WS_BASE_URL}/ws`);
+
+// Vehicles WebSocket client for vehicles microservice (port 8081)
+const VEHICLES_WS_BASE_URL = import.meta.env.VITE_VEHICLES_WS_BASE_URL || 'ws://localhost:8081';
+export const vehiclesWsClient = new WebSocketClient(`${VEHICLES_WS_BASE_URL}/ws`);

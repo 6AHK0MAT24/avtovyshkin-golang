@@ -55,13 +55,16 @@ func main() {
 	// Create router
 	router := mux.NewRouter()
 
-	// Apply middleware
+	// Apply middleware globally
 	router.Use(middleware.RecoveryMiddleware)
 	router.Use(middleware.LoggingMiddleware)
-	router.Use(middleware.CORSMiddleware(cfg.CORS.AllowedOrigins))
+
+	// API routes with middleware
+	api := router.PathPrefix("/api").Subrouter()
+	api.Use(middleware.CORSMiddleware(cfg.CORS.AllowedOrigins))
 
 	// Global OPTIONS handler for CORS preflight requests
-	router.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	api.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
 
@@ -69,12 +72,8 @@ func main() {
 	fs := http.FileServer(http.Dir("uploads"))
 	router.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", fs))
 
-	// API routes
-	api := router.PathPrefix("/api").Subrouter()
-
 	// Vehicle routes
-	api.HandleFunc("/vehicles", vehicleHandler.CreateVehicle).Methods("POST", "OPTIONS")
-	api.HandleFunc("/vehicles", vehicleHandler.GetVehicles).Methods("GET", "OPTIONS")
+	api.HandleFunc("/vehicles", vehicleHandler.CreateVehicle).Methods("POST", "OPTIONS")	api.HandleFunc("/vehicles", vehicleHandler.GetVehicles).Methods("GET", "OPTIONS")
 	api.HandleFunc("/vehicles/search", vehicleHandler.SearchVehicles).Methods("GET", "OPTIONS")
 	api.HandleFunc("/vehicles/{id}", vehicleHandler.GetVehicle).Methods("GET", "OPTIONS")
 	api.HandleFunc("/vehicles/{id}", vehicleHandler.UpdateVehicle).Methods("PUT", "OPTIONS")
@@ -85,9 +84,8 @@ func main() {
 	api.HandleFunc("/vehicles/{id}/images/{index}", vehicleHandler.DeleteVehicleImage).Methods("DELETE", "OPTIONS")
 	api.HandleFunc("/vehicles/{id}/main-image", vehicleHandler.SetMainImage).Methods("PUT", "OPTIONS")
 
-	// WebSocket route
+	// WebSocket route - without CORS middleware to allow proper upgrade
 	router.HandleFunc("/ws", wsHandler.HandleWebSocket)
-
 	// Health check
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
