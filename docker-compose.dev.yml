@@ -13,14 +13,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/drivers-microservice/migrations:/docker-entrypoint-initdb.d/01-drivers
-      - ./backend/vehicles-microservice/migrations:/docker-entrypoint-initdb.d/02-vehicles    networks:
+      - ./backend/vehicles-microservice/migrations:/docker-entrypoint-initdb.d/02-vehicles
+    networks:
       - avtovyshkin-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
-
 volumes:
   postgres_data:
 
