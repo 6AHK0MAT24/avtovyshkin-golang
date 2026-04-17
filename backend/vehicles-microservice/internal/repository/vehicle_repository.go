@@ -40,19 +40,19 @@ func NewVehicleRepository(db *sqlx.DB) VehicleRepository {
 func (r *vehicleRepository) Create(ctx context.Context, vehicle *models.Vehicle) error {
 	query := `
 		INSERT INTO vehicles (
-			fldId, fldGarageNumber, fldVIN, fldHeight, fldType, fldPower,
-			fldPrice5, fldPrice22, fldDescription, fldBrand, fldMachine,
-			fldLength, fldWidth, fldHeightTs, fldWidthWithSupports, fldMass,
-			fldCradleWidthFolded, fldCradleWidthExtended, fldCradleLengthFolded, fldCradleLengthExtended,
-			fldImgArray, fldMainImageIndex, fldSpecial, fldRostechReg, fldStatus,
-			fldCreatedAt, fldUpdatedAt
+			fldid, fldgaragenumber, fldvin, fldheight, fldtype, fldpower,
+			fldprice5, fldprice22, flddescription, fldbrand, fldmachine,
+			fldlength, fldwidth, fldheightts, fldwidthwithsupports, fldmass,
+			fldcradlewidthfolded, fldcradlewidthextended, fldcradlelengthfolded, fldcradlelengthextended,
+			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
+			fldcreatedat, fldupdatedat
 		) VALUES (
-			:fldId, :fldGarageNumber, :fldVIN, :fldHeight, :fldType, :fldPower,
-			:fldPrice5, :fldPrice22, :fldDescription, :fldBrand, :fldMachine,
-			:fldLength, :fldWidth, :fldHeightTs, :fldWidthWithSupports, :fldMass,
-			:fldCradleWidthFolded, :fldCradleWidthExtended, :fldCradleLengthFolded, :fldCradleLengthExtended,
-			:fldImgArray, :fldMainImageIndex, :fldSpecial, :fldRostechReg, :fldStatus,
-			:fldCreatedAt, :fldUpdatedAt
+			:fldid, :fldgaragenumber, :fldvin, :fldheight, :fldtype, :fldpower,
+			:fldprice5, :fldprice22, :flddescription, :fldbrand, :fldmachine,
+			:fldlength, :fldwidth, :fldheightts, :fldwidthwithsupports, :fldmass,
+			:fldcradlewidthfolded, :fldcradlewidthextended, :fldcradlelengthfolded, :fldcradlelengthextended,
+			:fldimgarray, :fldmainimageindex, :fldspecial, :fldrostechreg, :fldstatus,
+			:fldcreatedat, :fldupdatedat
 		)
 	`
 
@@ -63,19 +63,18 @@ func (r *vehicleRepository) Create(ctx context.Context, vehicle *models.Vehicle)
 
 	return nil
 }
-
 // GetByID retrieves a vehicle by its ID
 func (r *vehicleRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.Vehicle, error) {
 	query := `
-		SELECT 
-			fldId, fldGarageNumber, fldVIN, fldHeight, fldType, fldPower,
-			fldPrice5, fldPrice22, fldDescription, fldBrand, fldMachine,
-			fldLength, fldWidth, fldHeightTs, fldWidthWithSupports, fldMass,
-			fldCradleWidthFolded, fldCradleWidthExtended, fldCradleLengthFolded, fldCradleLengthExtended,
-			fldImgArray, fldMainImageIndex, fldSpecial, fldRostechReg, fldStatus,
-			fldCreatedAt, fldUpdatedAt
+		SELECT
+			fldid, fldgaragenumber, fldvin, fldheight, fldtype, fldpower,
+			fldprice5, fldprice22, flddescription, fldbrand, fldmachine,
+			fldlength, fldwidth, fldheightts, fldwidthwithsupports, fldmass,
+			fldcradlewidthfolded, fldcradlewidthextended, fldcradlelengthfolded, fldcradlelengthextended,
+			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
+			fldcreatedat, fldupdatedat
 		FROM vehicles
-		WHERE fldId = $1
+		WHERE fldid = $1
 	`
 
 	var vehicle models.Vehicle
@@ -89,7 +88,6 @@ func (r *vehicleRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.
 
 	return &vehicle, nil
 }
-
 // GetAll retrieves all vehicles with pagination
 func (r *vehicleRepository) GetAll(ctx context.Context, limit, offset int) ([]*models.Vehicle, int64, error) {
 	// Get total count
@@ -126,32 +124,32 @@ func (r *vehicleRepository) GetAll(ctx context.Context, limit, offset int) ([]*m
 func (r *vehicleRepository) Update(ctx context.Context, vehicle *models.Vehicle) error {
 	query := `
 		UPDATE vehicles SET
-			fldGarageNumber = :fldGarageNumber,
-			fldVIN = :fldVIN,
-			fldHeight = :fldHeight,
-			fldType = :fldType,
-			fldPower = :fldPower,
-			fldPrice5 = :fldPrice5,
-			fldPrice22 = :fldPrice22,
-			fldDescription = :fldDescription,
-			fldBrand = :fldBrand,
-			fldMachine = :fldMachine,
-			fldLength = :fldLength,
-			fldWidth = :fldWidth,
-			fldHeightTs = :fldHeightTs,
-			fldWidthWithSupports = :fldWidthWithSupports,
-			fldMass = :fldMass,
-			fldCradleWidthFolded = :fldCradleWidthFolded,
-			fldCradleWidthExtended = :fldCradleWidthExtended,
-			fldCradleLengthFolded = :fldCradleLengthFolded,
-			fldCradleLengthExtended = :fldCradleLengthExtended,
-			fldImgArray = :fldImgArray,
-			fldMainImageIndex = :fldMainImageIndex,
-			fldSpecial = :fldSpecial,
-			fldRostechReg = :fldRostechReg,
-			fldStatus = :fldStatus,
-			fldUpdatedAt = :fldUpdatedAt
-		WHERE fldId = :fldId
+			fldgaragenumber = :fldgaragenumber,
+			fldvin = :fldvin,
+			fldheight = :fldheight,
+			fldtype = :fldtype,
+			fldpower = :fldpower,
+			fldprice5 = :fldprice5,
+			fldprice22 = :fldprice22,
+			flddescription = :flddescription,
+			fldbrand = :fldbrand,
+			fldmachine = :fldmachine,
+			fldlength = :fldlength,
+			fldwidth = :fldwidth,
+			fldheightts = :fldheightts,
+			fldwidthwithsupports = :fldwidthwithsupports,
+			fldmass = :fldmass,
+			fldcradlewidthfolded = :fldcradlewidthfolded,
+			fldcradlewidthextended = :fldcradlewidthextended,
+			fldcradlelengthfolded = :fldcradlelengthfolded,
+			fldcradlelengthextended = :fldcradlelengthextended,
+			fldimgarray = :fldimgarray,
+			fldmainimageindex = :fldmainimageindex,
+			fldspecial = :fldspecial,
+			fldrostechreg = :fldrostechreg,
+			fldstatus = :fldstatus,
+			fldupdatedat = :fldupdatedat
+		WHERE fldid = :fldid
 	`
 
 	result, err := r.db.NamedExecContext(ctx, query, vehicle)
@@ -170,10 +168,9 @@ func (r *vehicleRepository) Update(ctx context.Context, vehicle *models.Vehicle)
 
 	return nil
 }
-
 // Delete removes a vehicle from the database
 func (r *vehicleRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	query := `DELETE FROM vehicles WHERE fldId = $1`
+	query := `DELETE FROM vehicles WHERE fldid = $1`
 
 	result, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
@@ -191,7 +188,6 @@ func (r *vehicleRepository) Delete(ctx context.Context, id uuid.UUID) error {
 
 	return nil
 }
-
 // Search searches vehicles by height and garage number
 func (r *vehicleRepository) Search(ctx context.Context, query string, limit, offset int) ([]*models.Vehicle, int64, error) {
 	// Parse query - can be height or garage number
@@ -201,7 +197,7 @@ func (r *vehicleRepository) Search(ctx context.Context, query string, limit, off
 	}
 
 	// Build search query
-	whereClause := `WHERE (fldGarageNumber ILIKE $1 OR CAST(fldHeight AS VARCHAR) ILIKE $1)`
+	whereClause := `WHERE (fldgaragenumber ILIKE $1 OR CAST(fldheight AS VARCHAR) ILIKE $1)`
 	searchParam := "%" + searchQuery + "%"
 
 	// Get total count
@@ -214,16 +210,16 @@ func (r *vehicleRepository) Search(ctx context.Context, query string, limit, off
 
 	// Get vehicles with pagination
 	selectQuery := `
-		SELECT 
-			fldId, fldGarageNumber, fldVIN, fldHeight, fldType, fldPower,
-			fldPrice5, fldPrice22, fldDescription, fldBrand, fldMachine,
-			fldLength, fldWidth, fldHeightTs, fldWidthWithSupports, fldMass,
-			fldCradleWidthFolded, fldCradleWidthExtended, fldCradleLengthFolded, fldCradleLengthExtended,
-			fldImgArray, fldMainImageIndex, fldSpecial, fldRostechReg, fldStatus,
-			fldCreatedAt, fldUpdatedAt
+		SELECT
+			fldid, fldgaragenumber, fldvin, fldheight, fldtype, fldpower,
+			fldprice5, fldprice22, flddescription, fldbrand, fldmachine,
+			fldlength, fldwidth, fldheightts, fldwidthwithsupports, fldmass,
+			fldcradlewidthfolded, fldcradlewidthextended, fldcradlelengthfolded, fldcradlelengthextended,
+			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
+			fldcreatedat, fldupdatedat
 		FROM vehicles
 		` + whereClause + `
-		ORDER BY fldCreatedAt DESC
+		ORDER BY fldcreatedat DESC
 		LIMIT $2 OFFSET $3
 	`
 
@@ -235,26 +231,25 @@ func (r *vehicleRepository) Search(ctx context.Context, query string, limit, off
 
 	return vehicles, total, nil
 }
-
 // GetByGarageNumber retrieves a vehicle by its garage number
 func (r *vehicleRepository) GetByGarageNumber(ctx context.Context, garageNumber string) (*models.Vehicle, error) {
 	query := `
-		SELECT 
-			fldId, fldGarageNumber, fldVIN, fldHeight, fldType, fldPower,
-			fldPrice5, fldPrice22, fldDescription, fldBrand, fldMachine,
-			fldLength, fldWidth, fldHeightTs, fldWidthWithSupports, fldMass,
-			fldCradleWidthFolded, fldCradleWidthExtended, fldCradleLengthFolded, fldCradleLengthExtended,
-			fldImgArray, fldMainImageIndex, fldSpecial, fldRostechReg, fldStatus,
-			fldCreatedAt, fldUpdatedAt
+		SELECT
+			fldid, fldgaragenumber, fldvin, fldheight, fldtype, fldpower,
+			fldprice5, fldprice22, flddescription, fldbrand, fldmachine,
+			fldlength, fldwidth, fldheightts, fldwidthwithsupports, fldmass,
+			fldcradlewidthfolded, fldcradlewidthextended, fldcradlelengthfolded, fldcradlelengthextended,
+			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
+			fldcreatedat, fldupdatedat
 		FROM vehicles
-		WHERE fldGarageNumber = $1
+		WHERE fldgaragenumber = $1
 	`
 
 	var vehicle models.Vehicle
 	err := r.db.GetContext(ctx, &vehicle, query, garageNumber)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("vehicle not found")
+			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to get vehicle by garage number: %w", err)
 	}
@@ -263,24 +258,23 @@ func (r *vehicleRepository) GetByGarageNumber(ctx context.Context, garageNumber 
 }
 
 // GetByVIN retrieves a vehicle by its VIN
-func (r *vehicleRepository) GetByVIN(ctx context.Context, vin string) (*models.Vehicle, error) {
-	query := `
-		SELECT 
-			fldId, fldGarageNumber, fldVIN, fldHeight, fldType, fldPower,
-			fldPrice5, fldPrice22, fldDescription, fldBrand, fldMachine,
-			fldLength, fldWidth, fldHeightTs, fldWidthWithSupports, fldMass,
-			fldCradleWidthFolded, fldCradleWidthExtended, fldCradleLengthFolded, fldCradleLengthExtended,
-			fldImgArray, fldMainImageIndex, fldSpecial, fldRostechReg, fldStatus,
-			fldCreatedAt, fldUpdatedAt
+func (r *vehicleRepository) GetByVIN(ctx context.Context, vin string) (*models.Vehicle, error) {	query := `
+		SELECT
+			fldid, fldgaragenumber, fldvin, fldheight, fldtype, fldpower,
+			fldprice5, fldprice22, flddescription, fldbrand, fldmachine,
+			fldlength, fldwidth, fldheightts, fldwidthwithsupports, fldmass,
+			fldcradlewidthfolded, fldcradlewidthextended, fldcradlelengthfolded, fldcradlelengthextended,
+			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
+			fldcreatedat, fldupdatedat
 		FROM vehicles
-		WHERE fldVIN = $1
+		WHERE fldvin = $1
 	`
 
 	var vehicle models.Vehicle
 	err := r.db.GetContext(ctx, &vehicle, query, vin)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("vehicle not found")
+			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to get vehicle by VIN: %w", err)
 	}
@@ -289,8 +283,7 @@ func (r *vehicleRepository) GetByVIN(ctx context.Context, vin string) (*models.V
 }
 
 // Close closes the database connection
-func (r *vehicleRepository) Close() error {
-	if r.db != nil {
+func (r *vehicleRepository) Close() error {	if r.db != nil {
 		return r.db.Close()
 	}
 	return nil

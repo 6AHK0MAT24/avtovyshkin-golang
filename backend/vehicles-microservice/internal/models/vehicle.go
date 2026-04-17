@@ -16,7 +16,7 @@ type Vehicle struct {
 	VIN                  string        `json:"vin" db:"fldvin"`
 	Height               float64       `json:"height" db:"fldheight"`
 	Type                 *string       `json:"type,omitempty" db:"fldtype"`
-	Power                *float64      `json:"power,omitempty" db:"fldpower"`
+	Power                *int          `json:"power,omitempty" db:"fldpower"`
 	Price5               *float64      `json:"price5,omitempty" db:"fldprice5"`
 	Price22              *float64      `json:"price22,omitempty" db:"fldprice22"`
 	Description          *string       `json:"description,omitempty" db:"flddescription"`
@@ -37,8 +37,7 @@ type Vehicle struct {
 	RostechReg           bool          `json:"rostechReg" db:"fldrostechreg"`
 	Status               VehicleStatus `json:"status" db:"fldstatus"`
 	CreatedAt            time.Time     `json:"createdAt" db:"fldcreatedat"`
-	UpdatedAt            time.Time     `json:"updatedAt" db:"fldupdatedat"`
-}
+	UpdatedAt            time.Time     `json:"updatedAt" db:"fldupdatedat"`}
 // VehicleStatus represents the status of a vehicle
 type VehicleStatus string
 
@@ -107,7 +106,7 @@ type CreateVehicleRequest struct {
 	VIN                  string    `json:"vin" validate:"required,len=17"`
 	Height               float64   `json:"height" validate:"required,gt=0"`
 	Type                 *string   `json:"type,omitempty" validate:"omitempty,oneof=Телескопическая Телескоп + колено Телескоп + стрела и рукоять"`
-	Power                *float64  `json:"power,omitempty" validate:"omitempty,gt=0"`
+	Power                *int      `json:"power,omitempty" validate:"omitempty,gt=0"`
 	Price5               *float64  `json:"price5,omitempty" validate:"omitempty,gt=0"`
 	Price22              *float64  `json:"price22,omitempty" validate:"omitempty,gt=0"`
 	Description          *string   `json:"description,omitempty"`
@@ -126,14 +125,13 @@ type CreateVehicleRequest struct {
 	RostechReg           *bool     `json:"rostechReg,omitempty"`
 	Status               *VehicleStatus `json:"status,omitempty" validate:"omitempty,oneof=active inactive blocked"`
 }
-
 // UpdateVehicleRequest represents the request to update a vehicle
 type UpdateVehicleRequest struct {
 	GarageNumber         *string         `json:"garageNumber,omitempty" validate:"omitempty"`
 	VIN                  *string         `json:"vin,omitempty" validate:"omitempty,len=17"`
 	Height               *float64        `json:"height,omitempty" validate:"omitempty,gt=0"`
 	Type                 *string         `json:"type,omitempty" validate:"omitempty,oneof=Телескопическая Телескоп + колено Телескоп + стрела и рукоять"`
-	Power                *float64        `json:"power,omitempty" validate:"omitempty,gt=0"`
+	Power                *int            `json:"power,omitempty" validate:"omitempty,gt=0"`
 	Price5               *float64        `json:"price5,omitempty" validate:"omitempty,gt=0"`
 	Price22              *float64        `json:"price22,omitempty" validate:"omitempty,gt=0"`
 	Description          *string         `json:"description,omitempty"`
@@ -153,7 +151,6 @@ type UpdateVehicleRequest struct {
 	Status               *VehicleStatus  `json:"status,omitempty" validate:"omitempty,oneof=active inactive blocked"`
 	MainImageIndex       *int            `json:"mainImageIndex,omitempty" validate:"omitempty,gte=0"`
 }
-
 // VehicleResponse represents the response for a vehicle
 type VehicleResponse struct {
 	ID                   uuid.UUID     `json:"id"`
@@ -161,7 +158,7 @@ type VehicleResponse struct {
 	VIN                  string        `json:"vin"`
 	Height               float64       `json:"height"`
 	Type                 *string       `json:"type,omitempty"`
-	Power                *float64      `json:"power,omitempty"`
+	Power                *int          `json:"power,omitempty"`
 	Price5               *float64      `json:"price5,omitempty"`
 	Price22              *float64      `json:"price22,omitempty"`
 	Description          *string       `json:"description,omitempty"`
@@ -184,7 +181,6 @@ type VehicleResponse struct {
 	CreatedAt            time.Time     `json:"createdAt"`
 	UpdatedAt            time.Time     `json:"updatedAt"`
 }
-
 // VehicleListResponse represents the response for a list of vehicles
 type VehicleListResponse struct {
 	Vehicles []VehicleResponse `json:"vehicles"`

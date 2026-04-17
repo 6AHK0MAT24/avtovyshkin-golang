@@ -11,6 +11,12 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
+		// Skip logging for WebSocket upgrade requests to avoid issues with response writer wrapping
+		if r.Header.Get("Upgrade") == "websocket" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		// Wrap response writer to capture status code
 		wrapped := &responseWriter{w, http.StatusOK}
 
@@ -25,7 +31,6 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		)
 	})
 }
-
 type responseWriter struct {
 	http.ResponseWriter
 	status int

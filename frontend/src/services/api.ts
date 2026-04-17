@@ -4,7 +4,7 @@ import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig, AxiosRespon
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 class ApiClient {
-  private client: AxiosInstance;
+  protected client: AxiosInstance;
 
   constructor() {
     this.client = axios.create({
@@ -41,8 +41,7 @@ class ApiClient {
         return Promise.reject(error);
       }
     );
-  }
-  public get<T = any>(url: string, params?: any) {
+  }  public get<T = any>(url: string, params?: any) {
     return this.client.get<T>(url, { params });
   }
 

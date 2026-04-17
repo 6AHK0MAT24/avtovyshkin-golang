@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+
+    <script>
+        // Test Drivers WebSocket
+        const driversWs = new WebSocket('ws://localhost:8080/ws');
+        const driversStatus = document.getElementById('drivers-status');
+        const driversMessages = document.getElementById('drivers-messages');
+
+        driversWs.onopen = () => {
+            console.log('Drivers WebSocket connected');
+            document.getElementById('status').innerHTML += '<br>Drivers WebSocket: Connected';
+        };
+
+        driversWs.onmessage = (event) => {
+            console.log('Drivers WebSocket message:', event.data);
+            document.getElementById('messages').innerHTML += '<br>Drivers: ' + event.data;
+        };
+
+        driversWs.onerror = (error) => {
+            console.error('Drivers WebSocket error:', error);
+            document.getElementById('status').innerHTML += '<br>Drivers WebSocket: Error';
+        };
+
+        driversWs.onclose = () => {
+            console.log('Drivers WebSocket closed');
+            document.getElementById('status').innerHTML += '<br>Drivers WebSocket: Closed';
+        };
+
+        // Test Vehicles WebSocket
+        const vehiclesWs = new WebSocket('ws://localhost:8081/ws');
+
+        vehiclesWs.onopen = () => {
+            console.log('Vehicles WebSocket connected');
+            document.getElementById('status').innerHTML += '<br>Vehicles WebSocket: Connected';
+        };
+
+        vehiclesWs.onmessage = (event) => {
+            console.log('Vehicles WebSocket message:', event.data);
+            document.getElementById('messages').innerHTML += '<br>Vehicles: ' + event.data;
+        };
+
+        vehiclesWs.onerror = (error) => {
+            console.error('Vehicles WebSocket error:', error);
+            document.getElementById('status').innerHTML += '<br>Vehicles WebSocket: Error';
+        };
+
+        vehiclesWs.onclose = () => {
+            console.log('Vehicles WebSocket closed');
+            document.getElementById('status').innerHTML += '<br>Vehicles WebSocket: Closed';
+        };
+    </script>
+</body>
+</html>

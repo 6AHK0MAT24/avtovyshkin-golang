@@ -23,15 +23,18 @@ class WebSocketClient {
     }
 
     try {
+      console.log(`Connecting to WebSocket: ${this.url}`);
       this.ws = new WebSocket(this.url);
 
       this.ws.onopen = () => {
+        console.log(`WebSocket connected: ${this.url}`);
         this.reconnectAttempts = 0;
       };
 
       this.ws.onmessage = (event) => {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
+          console.log(`WebSocket message received from ${this.url}:`, message);
           this.handleMessage(message);
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);
@@ -39,17 +42,17 @@ class WebSocketClient {
       };
 
       this.ws.onclose = () => {
+        console.log(`WebSocket closed: ${this.url}`);
         this.attemptReconnect();
       };
 
       this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error(`WebSocket error (${this.url}):`, error);
       };
     } catch (error) {
-      console.error('Failed to create WebSocket connection:', error);
+      console.error(`Failed to create WebSocket connection (${this.url}):`, error);
       this.attemptReconnect();
-    }
-  }
+    }  }
 
   reconnect(): void {
     if (this.ws) {

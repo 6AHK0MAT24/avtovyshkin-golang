@@ -50,14 +50,14 @@ func (m *Manager) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 // BroadcastVehicleCreated broadcasts vehicle created event
 func (m *Manager) BroadcastVehicleCreated(vehicle *models.Vehicle) error {
+	log.Printf("Broadcasting vehicle.created event, clients: %d", m.hub.GetClientCount())
 	return m.hub.BroadcastEvent("vehicle.created", vehicle.ToResponse())
 }
-
 // BroadcastVehicleUpdated broadcasts vehicle updated event
 func (m *Manager) BroadcastVehicleUpdated(vehicle *models.Vehicle) error {
+	log.Printf("Broadcasting vehicle.updated event, clients: %d", m.hub.GetClientCount())
 	return m.hub.BroadcastEvent("vehicle.updated", vehicle.ToResponse())
 }
-
 // BroadcastVehicleDeleted broadcasts vehicle deleted event
 func (m *Manager) BroadcastVehicleDeleted(vehicleID string) error {
 	id, err := uuid.Parse(vehicleID)

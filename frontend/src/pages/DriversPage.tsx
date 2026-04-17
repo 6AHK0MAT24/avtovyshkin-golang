@@ -68,20 +68,8 @@ export const DriversPage: React.FC = () => {
   useWebSocket('driver.created', handleDriverCreated);
   useWebSocket('driver.updated', handleDriverUpdated);
   useWebSocket('driver.deleted', handleDriverDeleted);
-  useWebSocket('driver.updated', (data: Driver) => {
-    console.log('driver.updated event received:', data);
-    message.info(`Водитель обновлен: ${data.lastName} ${data.firstName}`);
-    updateDriverInStore(data.id, data);
-    refetch();
-  });
 
-  useWebSocket('driver.deleted', (data: { id: string }) => {
-    console.log('driver.deleted event received:', data);
-    message.warning('Водитель удален');
-    removeDriver(data.id);
-    refetch();
-  });  const handleCreate = () => {
-    setSelectedDriver(null);
+  const handleCreate = () => {    setSelectedDriver(null);
     setViewMode('create');
   };
 
