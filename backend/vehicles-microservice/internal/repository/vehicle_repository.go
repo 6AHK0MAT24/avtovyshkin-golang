@@ -102,18 +102,17 @@ func (r *vehicleRepository) GetAll(ctx context.Context, limit, offset int) ([]*m
 
 	// Get vehicles with pagination
 	query := `
-		SELECT 
-			fldId, fldGarageNumber, fldVIN, fldHeight, fldType, fldPower,
-			fldPrice5, fldPrice22, fldDescription, fldBrand, fldMachine,
-			fldLength, fldWidth, fldHeightTs, fldWidthWithSupports, fldMass,
-			fldCradleWidthFolded, fldCradleWidthExtended, fldCradleLengthFolded, fldCradleLengthExtended,
-			fldImgArray, fldMainImageIndex, fldSpecial, fldRostechReg, fldStatus,
-			fldCreatedAt, fldUpdatedAt
+		SELECT
+			fldid, fldgaragenumber, fldvin, fldheight, fldtype, fldpower,
+			fldprice5, fldprice22, flddescription, fldbrand, fldmachine,
+			fldlength, fldwidth, fldheightts, fldwidthwithsupports, fldmass,
+			fldcradlewidthfolded, fldcradlewidthextended, fldcradlelengthfolded, fldcradlelengthextended,
+			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
+			fldcreatedat, fldupdatedat
 		FROM vehicles
-		ORDER BY fldCreatedAt DESC
+		ORDER BY fldcreatedat DESC
 		LIMIT $1 OFFSET $2
 	`
-
 	var vehicles []*models.Vehicle
 	err = r.db.SelectContext(ctx, &vehicles, query, limit, offset)
 	if err != nil {

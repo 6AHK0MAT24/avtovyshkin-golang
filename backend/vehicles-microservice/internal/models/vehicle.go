@@ -11,35 +11,34 @@ import (
 
 // Vehicle represents the vehicle entity in the database
 type Vehicle struct {
-	ID                   uuid.UUID     `json:"id" db:"fldId"`
-	GarageNumber         string        `json:"garageNumber" db:"fldGarageNumber"`
-	VIN                  string        `json:"vin" db:"fldVIN"`
-	Height               float64       `json:"height" db:"fldHeight"`
-	Type                 *string       `json:"type,omitempty" db:"fldType"`
-	Power                *float64      `json:"power,omitempty" db:"fldPower"`
-	Price5               *float64      `json:"price5,omitempty" db:"fldPrice5"`
-	Price22              *float64      `json:"price22,omitempty" db:"fldPrice22"`
-	Description          *string       `json:"description,omitempty" db:"fldDescription"`
-	Brand                *string       `json:"brand,omitempty" db:"fldBrand"`
-	Machine              *string       `json:"machine,omitempty" db:"fldMachine"`
-	Length               *float64      `json:"length,omitempty" db:"fldLength"`
-	Width                *float64      `json:"width,omitempty" db:"fldWidth"`
-	HeightTs             *float64      `json:"heightTs,omitempty" db:"fldHeight"`
-	WidthWithSupports    *float64      `json:"widthWithSupports,omitempty" db:"fldWidthWithSupports"`
-	Mass                 *float64      `json:"mass,omitempty" db:"fldMass"`
-	CradleWidthFolded    *float64      `json:"cradleWidthFolded,omitempty" db:"fldCradleWidthFolded"`
-	CradleWidthExtended  *float64      `json:"cradleWidthExtended,omitempty" db:"fldCradleWidthExtended"`
-	CradleLengthFolded   *float64      `json:"cradleLengthFolded,omitempty" db:"fldCradleLengthFolded"`
-	CradleLengthExtended *float64      `json:"cradleLengthExtended,omitempty" db:"fldCradleLengthExtended"`
-	ImgArray             StringArray   `json:"imgArray" db:"fldImgArray"`
-	MainImageIndex       int           `json:"mainImageIndex" db:"fldMainImageIndex"`
-	Special              *string       `json:"special,omitempty" db:"fldSpecial"`
-	RostechReg           bool          `json:"rostechReg" db:"fldRostechReg"`
-	Status               VehicleStatus `json:"status" db:"fldStatus"`
-	CreatedAt            time.Time     `json:"createdAt" db:"fldCreatedAt"`
-	UpdatedAt            time.Time     `json:"updatedAt" db:"fldUpdatedAt"`
+	ID                   uuid.UUID     `json:"id" db:"fldid"`
+	GarageNumber         string        `json:"garageNumber" db:"fldgaragenumber"`
+	VIN                  string        `json:"vin" db:"fldvin"`
+	Height               float64       `json:"height" db:"fldheight"`
+	Type                 *string       `json:"type,omitempty" db:"fldtype"`
+	Power                *float64      `json:"power,omitempty" db:"fldpower"`
+	Price5               *float64      `json:"price5,omitempty" db:"fldprice5"`
+	Price22              *float64      `json:"price22,omitempty" db:"fldprice22"`
+	Description          *string       `json:"description,omitempty" db:"flddescription"`
+	Brand                *string       `json:"brand,omitempty" db:"fldbrand"`
+	Machine              *string       `json:"machine,omitempty" db:"fldmachine"`
+	Length               *float64      `json:"length,omitempty" db:"fldlength"`
+	Width                *float64      `json:"width,omitempty" db:"fldwidth"`
+	HeightTs             *float64      `json:"heightTs,omitempty" db:"fldheightts"`
+	WidthWithSupports    *float64      `json:"widthWithSupports,omitempty" db:"fldwidthwithsupports"`
+	Mass                 *float64      `json:"mass,omitempty" db:"fldmass"`
+	CradleWidthFolded    *float64      `json:"cradleWidthFolded,omitempty" db:"fldcradlewidthfolded"`
+	CradleWidthExtended  *float64      `json:"cradleWidthExtended,omitempty" db:"fldcradlewidthextended"`
+	CradleLengthFolded   *float64      `json:"cradleLengthFolded,omitempty" db:"fldcradlelengthfolded"`
+	CradleLengthExtended *float64      `json:"cradleLengthExtended,omitempty" db:"fldcradlelengthextended"`
+	ImgArray             StringArray   `json:"imgArray" db:"fldimgarray"`
+	MainImageIndex       int           `json:"mainImageIndex" db:"fldmainimageindex"`
+	Special              *string       `json:"special,omitempty" db:"fldspecial"`
+	RostechReg           bool          `json:"rostechReg" db:"fldrostechreg"`
+	Status               VehicleStatus `json:"status" db:"fldstatus"`
+	CreatedAt            time.Time     `json:"createdAt" db:"fldcreatedat"`
+	UpdatedAt            time.Time     `json:"updatedAt" db:"fldupdatedat"`
 }
-
 // VehicleStatus represents the status of a vehicle
 type VehicleStatus string
 

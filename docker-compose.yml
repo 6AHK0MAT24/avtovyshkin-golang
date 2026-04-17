@@ -12,7 +12,8 @@ services:
       - "${POSTGRES_CONTAINER_PORT:-54320}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/drivers-microservice/migrations:/docker-entrypoint-initdb.d
+      - ./backend/drivers-microservice/migrations:/docker-entrypoint-initdb.d/01-drivers
+      - ./backend/vehicles-microservice/migrations:/docker-entrypoint-initdb.d/02-vehicles
     networks:
       - avtovyshkin-network
     healthcheck:
@@ -46,6 +47,32 @@ services:
       - avtovyshkin-network
     volumes:
       - ./backend/drivers-microservice/uploads:/app/uploads
+
+  vehicles-microservice:
+    build:
+      context: ./backend/vehicles-microservice
+      dockerfile: Dockerfile
+    container_name: avtovyshkin-vehicles-microservice
+    environment:
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_NAME: ${POSTGRES_DB:-avtovyshkin_db_go}
+      SERVER_PORT: ${VEHICLES_SERVER_PORT:-8081}
+      CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000
+      CORS_ALLOWED_METHODS: GET,POST,PUT,DELETE,OPTIONS
+      CORS_ALLOWED_HEADERS: Content-Type,Authorization,X-Requested-With
+      ALLOWED_FILE_TYPES: jpg,jpeg,png,gif,webp,bmp,tiff,svg,pdf
+    ports:
+      - "${VEHICLES_SERVER_PORT:-8081}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - avtovyshkin-network
+    volumes:
+      - ./backend/vehicles-microservice/uploads:/app/uploads
 
   # Frontend - только для production (nginx + статику)
   # Для разработки используйте: cd frontend && yarn dev

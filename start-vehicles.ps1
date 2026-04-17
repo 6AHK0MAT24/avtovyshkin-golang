@@ -7,9 +7,8 @@ $postgresRunning = docker ps --filter "name=avtovyshkin-postgres" --format "{{.N
 if (-not $postgresRunning) {
     Write-Host "PostgreSQL is not running. Starting..." -ForegroundColor Yellow
     docker-compose -f docker-compose.dev.yml up -d postgres
-    Start-Sleep -Seconds 3
+    Start-Sleep -Seconds 5
 }
-
 # Change to vehicles microservice directory
 $vehiclesDir = "backend/vehicles-microservice"
 if (-not (Test-Path $vehiclesDir)) {

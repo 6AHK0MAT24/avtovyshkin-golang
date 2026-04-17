@@ -73,7 +73,8 @@ func main() {
 	router.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", fs))
 
 	// Vehicle routes
-	api.HandleFunc("/vehicles", vehicleHandler.CreateVehicle).Methods("POST", "OPTIONS")	api.HandleFunc("/vehicles", vehicleHandler.GetVehicles).Methods("GET", "OPTIONS")
+	api.HandleFunc("/vehicles", vehicleHandler.CreateVehicle).Methods("POST", "OPTIONS")
+	api.HandleFunc("/vehicles", vehicleHandler.GetVehicles).Methods("GET", "OPTIONS")
 	api.HandleFunc("/vehicles/search", vehicleHandler.SearchVehicles).Methods("GET", "OPTIONS")
 	api.HandleFunc("/vehicles/{id}", vehicleHandler.GetVehicle).Methods("GET", "OPTIONS")
 	api.HandleFunc("/vehicles/{id}", vehicleHandler.UpdateVehicle).Methods("PUT", "OPTIONS")
