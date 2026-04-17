@@ -1,26 +1,42 @@
-# Автовышкин - Система управления водителями
+# Автовышкин - Система управления водителями и автовышками
 
-Микросервисная система для управления водителями с использованием Go, React и PostgreSQL.
+Микросервисная система для управления водителями и автовышками с использованием Go, React и PostgreSQL.
 
 ## Структура проекта
 
 ```
 avtovyshkin-golang/
-├── drivers-service/          # Backend (Go)
-│   ├── cmd/                  # Точка входа приложения
-│   ├── internal/             # Внутренние пакеты
-│   │   ├── config/          # Конфигурация
-│   │   ├── handler/         # HTTP handlers
-│   │   ├── middleware/      # Middleware
-│   │   ├── models/          # Модели данных
-│   │   ├── repository/      # Data Access Layer
-│   │   ├── service/         # Бизнес-логика
-│   │   ├── utils/           # Утилиты
-│   │   └── websocket/       # WebSocket для real-time
-│   ├── migrations/          # SQL миграции
-│   ├── uploads/             # Загруженные файлы
-│   ├── go.mod
-│   └── go.sum
+├── backend/
+│   ├── drivers-microservice/ # Drivers Service (Go)
+│   │   ├── cmd/              # Точка входа приложения
+│   │   ├── internal/         # Внутренние пакеты
+│   │   │   ├── config/      # Конфигурация
+│   │   │   ├── handler/     # HTTP handlers
+│   │   │   ├── middleware/  # Middleware
+│   │   │   ├── models/      # Модели данных
+│   │   │   ├── repository/  # Data Access Layer
+│   │   │   ├── service/     # Бизнес-логика
+│   │   │   ├── utils/       # Утилиты
+│   │   │   └── websocket/   # WebSocket для real-time
+│   │   ├── migrations/      # SQL миграции
+│   │   ├── uploads/         # Загруженные файлы
+│   │   ├── go.mod
+│   │   └── go.sum
+│   └── vehicles-microservice/ # Vehicles Service (Go)
+│       ├── cmd/              # Точка входа приложения
+│       ├── internal/         # Внутренние пакеты
+│       │   ├── config/      # Конфигурация
+│       │   ├── handler/     # HTTP handlers
+│       │   ├── middleware/  # Middleware
+│       │   ├── models/      # Модели данных
+│       │   ├── repository/  # Data Access Layer
+│       │   ├── service/     # Бизнес-логика
+│       │   ├── utils/       # Утилиты
+│       │   └── websocket/   # WebSocket для real-time
+│       ├── migrations/      # SQL миграции
+│       ├── uploads/         # Загруженные файлы
+│       ├── go.mod
+│       └── go.sum
 ├── frontend/                # Frontend (React + TypeScript)
 │   ├── src/
 │   │   ├── components/      # React компоненты
@@ -36,12 +52,19 @@ avtovyshkin-golang/
 
 ## Технологический стек
 
-### Backend
+### Drivers Service (Backend)
 - **Go 1.21** - Язык программирования
 - **PostgreSQL 13.3** - База данных
 - **Gorilla Mux** - HTTP роутер
 - **Gorilla WebSocket** - WebSocket для real-time
 - **lib/pq** - PostgreSQL драйвер
+
+### Vehicles Service (Backend)
+- **Go 1.21** - Язык программирования
+- **PostgreSQL 13.3** - База данных
+- **Gorilla Mux** - HTTP роутер
+- **Gorilla WebSocket** - WebSocket для real-time
+- **sqlx** - PostgreSQL драйвер
 
 ### Frontend
 - **React 19** - UI библиотека
@@ -78,16 +101,19 @@ docker-compose down
 
 #### Рекомендуемый режим разработки (PostgreSQL в Docker + Hot Reload)
 
-Для локальной разработки рекомендуется использовать PostgreSQL в Docker с hot reload для бэкенда:
+Для локальной разработки рекомендуется использовать PostgreSQL в Docker с hot reload для микросервисов:
 
 ```powershell
 # 1. Запуск PostgreSQL в Docker
 .\start-dev.ps1
 
-# 2. Запуск бэкенда с hot reload (в новом терминале)
+# 2. Запуск Drivers Service с hot reload (в новом терминале)
 .\start-backend.ps1
 
-# 3. Запуск фронтенда (в новом терминале)
+# 3. Запуск Vehicles Service с hot reload (в новом терминале)
+.\start-vehicles.ps1
+
+# 4. Запуск фронтенда (в новом терминале)
 .\start-frontend.ps1
 
 # Остановка PostgreSQL
@@ -96,7 +122,7 @@ docker-compose down
 
 **Преимущества этого режима:**
 - ✅ PostgreSQL работает в Docker (изолирован и легко управляем)
-- ✅ Бэкенд запускается локально с hot reload (изменения применяются автоматически)
+- ✅ Микросервисы запускаются локально с hot reload (изменения применяются автоматически)
 - ✅ Быстрый цикл разработки без пересборки Docker контейнеров
 - ✅ Полный доступ к отладке и логам
 

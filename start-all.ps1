@@ -16,11 +16,10 @@ if (-not $postgresRunning) {
     Write-Host "[1/3] PostgreSQL is already running." -ForegroundColor Green
 }
 
-# Start backend in new window
-Write-Host "[2/4] Starting Backend..." -ForegroundColor Yellow
+# Start drivers service in new window
+Write-Host "[2/4] Starting Drivers Service..." -ForegroundColor Yellow
 $backendScript = Join-Path $PSScriptRoot "start-backend.ps1"
 Start-Process powershell -ArgumentList "-NoExit", "-File", $backendScript
-
 # Wait a bit for backend to start
 Start-Sleep -Seconds 3
 
@@ -41,7 +40,7 @@ Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Project started!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Backend:           http://localhost:8080" -ForegroundColor White
+Write-Host "Drivers Service:   http://localhost:8080" -ForegroundColor White
 Write-Host "Vehicles Service:  http://localhost:8081" -ForegroundColor White
 Write-Host "Frontend:          http://localhost:5173" -ForegroundColor White
 Write-Host "========================================" -ForegroundColor Cyan

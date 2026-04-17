@@ -1,7 +1,6 @@
-# Script to start backend service with hot reload
+# Script to start drivers service with hot reload
 
 Write-Host "Starting Drivers Service with hot reload..." -ForegroundColor Green
-
 # Check if PostgreSQL is running
 $postgresRunning = docker ps --filter "name=avtovyshkin-postgres" --format "{{.Names}}"
 if (-not $postgresRunning) {
@@ -10,13 +9,12 @@ if (-not $postgresRunning) {
     Start-Sleep -Seconds 3
 }
 
-# Change to backend directory
+# Change to drivers service directory
 $backendDir = "backend/drivers-microservice"
 if (-not (Test-Path $backendDir)) {
     Write-Host "Error: Directory $backendDir not found!" -ForegroundColor Red
     exit 1
 }
-
 Set-Location $backendDir
 
 # Check port 8080
@@ -41,7 +39,7 @@ if (-not (Test-Path $airPath)) {
     Write-Host "air installed successfully." -ForegroundColor Green
 }
 
-# Start backend with hot reload
-Write-Host "Starting server with hot reload on port 8080..." -ForegroundColor Cyan
+# Start drivers service with hot reload
+Write-Host "Starting drivers service with hot reload on port 8080..." -ForegroundColor Cyan
 Write-Host "Code changes will be applied automatically." -ForegroundColor Cyan
 & $airPath
