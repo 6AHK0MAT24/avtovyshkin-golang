@@ -12,9 +12,7 @@ import (
 	"vehicles-service/internal/models"
 	"vehicles-service/internal/repository"
 	"vehicles-service/internal/utils"
-)
-
-// VehicleService defines interface for vehicle business logic
+)// VehicleService defines interface for vehicle business logic
 type VehicleService interface {
 	CreateVehicle(ctx context.Context, req *models.CreateVehicleRequest) (*models.Vehicle, error)
 	GetVehicle(ctx context.Context, id uuid.UUID) (*models.Vehicle, error)
@@ -104,15 +102,6 @@ func (s *vehicleService) CreateVehicle(ctx context.Context, req *models.CreateVe
 		return nil, fmt.Errorf("failed to create vehicle: %w", err)
 	}
 
-	return vehicle, nil
-}
-
-// GetVehicle retrieves a vehicle by ID
-func (s *vehicleService) GetVehicle(ctx context.Context, id uuid.UUID) (*models.Vehicle, error) {
-	vehicle, err := s.repo.GetByID(ctx, id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get vehicle: %w", err)
-	}
 	return vehicle, nil
 }
 
@@ -273,13 +262,8 @@ func (s *vehicleService) UploadVehicleImages(ctx context.Context, id uuid.UUID, 
 		return nil, fmt.Errorf("failed to get vehicle: %w", err)
 	}
 
-	// Determine upload directory
-	brand := "unknown"
-	if vehicle.Brand != nil && *vehicle.Brand != "" {
-		brand = strings.ReplaceAll(*vehicle.Brand, " ", "_")
-	}
-	uploadDir := filepath.Join("uploads", "cars", fmt.Sprintf("%s_%.0f", brand, vehicle.Height))
-
+	// Determine upload directory using vehicle ID
+	uploadDir := filepath.Join("uploads", "cars", vehicle.ID.String())
 	// Create directory if it doesn't exist
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create upload directory: %w", err)
@@ -303,9 +287,18 @@ func (s *vehicleService) UploadVehicleImages(ctx context.Context, id uuid.UUID, 
 			return nil, fmt.Errorf("failed to save file: %w", err)
 		}
 
-		newImages = append(newImages, filePath)
-	}
+		// Convert to relative path with forward slashes and remove duplicates
+		relativePath := strings.ReplaceAll(filePath, "\\", "/")
+		// Remove duplicate slashes
+		for strings.Contains(relativePath, "//") {
+			relativePath = strings.ReplaceAll(relativePath, "//", "/")
+		}
+		if !strings.HasPrefix(relativePath, "/") {
+			relativePath = "/" + relativePath
+		}
 
+		newImages = append(newImages, relativePath)
+	}
 	// Update vehicle with new images
 	vehicle.ImgArray = append(vehicle.ImgArray, newImages...)
 	vehicle.UpdatedAt = time.Now()

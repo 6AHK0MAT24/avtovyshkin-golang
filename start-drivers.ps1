@@ -4,10 +4,12 @@
 $Host.UI.RawUI.WindowTitle = "Drivers Service"
 
 Write-Host "Starting Drivers Service with hot reload..." -ForegroundColor Green
-Write-Host "Using MySQL database on REG.RU" -ForegroundColor Cyan# Change to drivers service directory
+Write-Host "Using MySQL database on localhost" -ForegroundColor Cyan
+
+# Change to drivers service directory
 $backendDir = "backend/drivers-microservice"
-if (-not (Test-Path $backendDir)) {
-    Write-Host "Error: Directory $backendDir not found!" -ForegroundColor Red
+
+if (-not (Test-Path $backendDir)) {    Write-Host "Error: Directory $backendDir not found!" -ForegroundColor Red
     exit 1
 }
 Set-Location $backendDir

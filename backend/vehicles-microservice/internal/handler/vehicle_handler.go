@@ -326,6 +326,12 @@ func (h *VehicleHandler) SetMainImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Индекс уже 1-based, используем как есть
+	if req.Index < 1 {
+		http.Error(w, "Invalid image index", http.StatusBadRequest)
+		return
+	}
+
 	if err := h.service.SetMainImageIndex(context.Background(), id, req.Index); err != nil {
 		log.Printf("Error setting main image: %v", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)

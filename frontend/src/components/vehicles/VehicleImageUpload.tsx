@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, message, Button, Typography, Space } from 'antd';
+import { Upload, message, Button, Typography, Flex } from 'antd';
 import { InboxOutlined, DeleteOutlined, StarOutlined, StarFilled } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 const { Dragger } = Upload;
@@ -7,55 +7,74 @@ const { Text } = Typography;
 
 interface VehicleImageUploadProps {
   images?: string[];
-  mainImageIndex?: number;
-  onChange?: (images: string[], mainImageIndex: number) => void;
+  mainImageIndex?: number; // Индексация с 1 для пользователя (1 = первая картинка)
+  onChange?: (images: string[], mainImageIndex: number, files?: File[]) => void;
   maxCount?: number;
   maxSize?: number; // в байтах
-}
-
-interface ImagePreview {
+}interface ImagePreview {
   url: string;
   file?: File;
 }
 
+// Получение полного URL с базовым доменом
+const getFullUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:')) {
+    return url;
+  }
+  return `http://localhost:8081${url}`;
+};
 export const VehicleImageUpload: React.FC<VehicleImageUploadProps> = ({
   images = [],
-  mainImageIndex = 0,
+  mainImageIndex = 1, // Индексация с 1 для пользователя
   onChange,
   maxCount = 20,
   maxSize = 10 * 1024 * 1024, // 10MB
 }) => {
-  const [previews, setPreviews] = useState<ImagePreview[]>(
-    images.map((url) => ({ url }))
-  );
-  const [currentMainIndex, setCurrentMainIndex] = useState(mainImageIndex);
+  // Конвертируем из 1-based (пользователь) в 0-based (внутренний)
+  const initialMainIndex = mainImageIndex > 0 ? mainImageIndex - 1 : 0;
+  
+  const [previews, setPreviews] = useState<ImagePreview[]>([]);
+  const [currentMainIndex, setCurrentMainIndex] = useState(initialMainIndex);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
-  const validateFile = (file: File): boolean => {
+  // Инициализация при загрузке компонента
+  React.useEffect(() => {
+    const initialPreviews = images.map((url) => ({ url: getFullUrl(url) }));
+    setPreviews(initialPreviews);
+    setCurrentMainIndex(initialMainIndex);
+  }, [images, initialMainIndex]);
+
+  const validateFile = (file: File): boolean => {    console.log('Validating file:', file.name, file.type, file.size);
+    console.log('Allowed types:', allowedTypes);
+    console.log('Current previews length:', previews.length);
+    console.log('Max count:', maxCount);
+    
     // Проверка типа файла
     if (!allowedTypes.includes(file.type)) {
+      console.log('File type not allowed');
       message.error('Допустимы только изображения (jpg, jpeg, png, gif, webp)');
       return false;
     }
 
     // Проверка размера файла
     if (file.size > maxSize) {
+      console.log('File size too large');
       message.error('Размер файла не должен превышать 10MB');
       return false;
     }
 
     // Проверка количества файлов
     if (previews.length >= maxCount) {
+      console.log('Max count reached');
       message.error(`Максимум ${maxCount} изображений`);
       return false;
     }
 
+    console.log('File validation passed');
     return true;
-  };
-
-  const handleFileSelect = (files: FileList | null) => {
+  };  const handleFileSelect = (files: FileList | null) => {
     if (!files) return;
 
     const validFiles: File[] = [];
@@ -78,52 +97,74 @@ export const VehicleImageUpload: React.FC<VehicleImageUploadProps> = ({
   };
 
   const handleDrop: UploadProps['customRequest'] = (options) => {
+    console.log('handleDrop called with options:', options);
     const { file } = options;
-    if (file instanceof File) {
-      handleFileSelect([file] as unknown as FileList);
-    }
-  };
+    console.log('File object:', file);
+    console.log('File instanceof File:', file instanceof File);
 
+    if (file instanceof File) {
+      console.log('Processing file:', file.name, file.size, file.type);
+
+      if (validateFile(file)) {
+        console.log('File validation passed');
+        const url = URL.createObjectURL(file);
+        console.log('Created blob URL:', url);
+
+        // Используем функциональное обновление состояния
+        setPreviews(prevPreviews => {
+          const newPreviews = [...prevPreviews, { url, file }];
+          console.log('New previews length after push:', newPreviews.length);
+          handleChange(newPreviews, currentMainIndex);
+          return newPreviews;
+        });
+      } else {
+        console.log('File validation failed');
+      }
+    }
+  };  const handleSetMain = (index: number) => {
+    setCurrentMainIndex(index);
+    handleChange(previews, index);
+  };
   const handleRemove = (index: number) => {
     const newPreviews = previews.filter((_, i) => i !== index);
+    
+    // Корректируем индекс основного изображения
     let newMainIndex = currentMainIndex;
-
-    // Если удалили основное изображение, устанавливаем новое основное
     if (index === currentMainIndex) {
+      // Если удаляем основное изображение, устанавливаем первое оставшееся как основное
       newMainIndex = newPreviews.length > 0 ? 0 : 0;
     } else if (index < currentMainIndex) {
-      // Если удалили изображение до основного, сдвигаем индекс
+      // Если удаляем изображение до основного, уменьшаем индекс
       newMainIndex = currentMainIndex - 1;
     }
-
+    
     setPreviews(newPreviews);
     setCurrentMainIndex(newMainIndex);
     handleChange(newPreviews, newMainIndex);
   };
 
-  const handleSetMain = (index: number) => {
-    setCurrentMainIndex(index);
-    handleChange(previews, index);
-  };
-
-  const handleChange = (newPreviews: ImagePreview[], newMainIndex: number) => {
-    if (onChange) {
+  const handleChange = (newPreviews: ImagePreview[], newMainIndex: number) => {    if (onChange) {
+      // Передаем все URL включая blob URL для предпросмотра
       const imageUrls = newPreviews.map((p) => p.url);
-      onChange(imageUrls, newMainIndex);
+
+      // Собираем файлы, которые нужно загрузить
+      const filesToUpload = newPreviews
+        .filter(p => p.url.startsWith('blob:') && p.file)
+        .map(p => p.file!);
+
+      // Конвертируем из 0-based в 1-based для пользователя
+      const userMainIndex = newMainIndex + 1;
+      onChange(imageUrls, userMainIndex, filesToUpload);
     }
-  };
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFileSelect(e.target.files);
+  };  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {    handleFileSelect(e.target.files);
     // Сбрасываем input, чтобы можно было выбрать те же файлы снова
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
-
   return (
     <div>
-      <Space direction="vertical" style={{ width: '100%' }} size="middle">
-        {/* Drag & Drop зона */}
+      <Flex vertical gap="middle" style={{ width: '100%' }}>        {/* Drag & Drop зона */}
         {previews.length < maxCount && (
           <Dragger
             name="images"
@@ -162,9 +203,8 @@ export const VehicleImageUpload: React.FC<VehicleImageUploadProps> = ({
           >
             {previews.map((preview, index) => (
               <div
-                key={index}
-                style={{
-                  position: 'relative',
+                key={`${preview.url}-${index}`}
+                style={{                  position: 'relative',
                   aspectRatio: '1',
                   borderRadius: '8px',
                   overflow: 'hidden',
@@ -234,8 +274,24 @@ export const VehicleImageUpload: React.FC<VehicleImageUploadProps> = ({
                     Основное
                   </div>
                 )}
-              </div>
-            ))}
+
+                {/* Индекс изображения */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: currentMainIndex === index ? 24 : 0,
+                    left: 0,
+                    right: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    color: 'white',
+                    textAlign: 'center',
+                    padding: '2px 8px',
+                    fontSize: '11px',
+                  }}
+                >
+                  #{index + 1}
+                </div>
+              </div>            ))}
           </div>
         )}
 
@@ -248,7 +304,6 @@ export const VehicleImageUpload: React.FC<VehicleImageUploadProps> = ({
           style={{ display: 'none' }}
           onChange={handleInputChange}
         />
-      </Space>
-    </div>
-  );
+      </Flex>
+    </div>  );
 };

@@ -54,11 +54,12 @@ func SaveVehicleImages(files []*multipart.FileHeader, brand string, height float
 
 		// Convert to relative path with forward slashes
 		relativePath := strings.ReplaceAll(filePath, "\\", "/")
+		// Remove duplicate slashes
+		relativePath = strings.ReplaceAll(relativePath, "//", "/")
 		// Ensure path starts with /
 		if !strings.HasPrefix(relativePath, "/") {
 			relativePath = "/" + relativePath
 		}
-
 		savedPaths = append(savedPaths, relativePath)
 	}
 

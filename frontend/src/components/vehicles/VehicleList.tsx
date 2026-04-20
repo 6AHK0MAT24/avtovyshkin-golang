@@ -4,7 +4,7 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useVehicles, useDeleteVehicle } from '../../hooks/useVehicles';
 import type { Vehicle, VehicleStatus } from '../../types/vehicle';
 import type { ColumnsType } from 'antd/es/table';
-
+import { ImageSlider } from './ImageSlider';
 interface VehicleListProps {
   onEdit: (vehicle: Vehicle) => void;
   onView?: (vehicle: Vehicle) => void;
@@ -32,10 +32,12 @@ export const VehicleList: React.FC<VehicleListProps> = ({
 }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [sliderVisible, setSliderVisible] = useState(false);
+  const [sliderImages, setSliderImages] = useState<string[]>([]);
+  const [sliderInitialIndex, setSliderInitialIndex] = useState(0);
 
   const { data, isLoading, error } = useVehicles(page, pageSize);
   const deleteVehicle = useDeleteVehicle();
-
   const handleDelete = async (id: string) => {
     try {
       await deleteVehicle.mutateAsync(id);
@@ -45,6 +47,15 @@ export const VehicleList: React.FC<VehicleListProps> = ({
     }
   };
 
+  const handleImageClick = (imgArray: string[], mainImageIndex: number) => {
+    if (!imgArray || imgArray.length === 0) return;
+    
+    // Конвертируем из 1-based (пользователь) в 0-based (ImageSlider)
+    const initialIndex = (mainImageIndex || 1) - 1;
+    setSliderImages(imgArray);
+    setSliderInitialIndex(initialIndex);
+    setSliderVisible(true);
+  };
   // Фильтрация данных
   const filteredVehicles = (data?.vehicles || [])
     .filter((vehicle) => {
@@ -67,8 +78,10 @@ export const VehicleList: React.FC<VehicleListProps> = ({
       key: 'photo',
       width: 80,
       render: (imgArray, record) => {
+        // Конвертируем из 1-based (пользователь) в 0-based (массив)
+        const mainImageIndex = (record.mainImageIndex || 1) - 1;
         const mainImage = imgArray && imgArray.length > 0
-          ? imgArray[record.mainImageIndex || 0]
+          ? imgArray[mainImageIndex]
           : null;
 
         return mainImage ? (
@@ -82,10 +95,10 @@ export const VehicleList: React.FC<VehicleListProps> = ({
               borderRadius: 4,
               cursor: 'pointer',
             }}
-            preview={{
-              mask: 'Увеличить',
-            }}
-          />        ) : (
+            preview={false}
+            onClick={() => handleImageClick(imgArray, record.mainImageIndex || 1)}
+          />
+        ) : (
           <div
             style={{
               width: 50,
@@ -103,8 +116,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
           </div>
         );
       },
-    },
-    {
+    },    {
       title: 'Гаражный №',
       dataIndex: 'garageNumber',
       key: 'garageNumber',
@@ -197,6 +209,13 @@ export const VehicleList: React.FC<VehicleListProps> = ({
             setPageSize(newPageSize || 10);
           },
         }}
+      />
+      
+      <ImageSlider
+        images={sliderImages}
+        initialIndex={sliderInitialIndex}
+        visible={sliderVisible}
+        onClose={() => setSliderVisible(false)}
       />
     </div>
   );

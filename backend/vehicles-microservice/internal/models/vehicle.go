@@ -127,9 +127,7 @@ type CreateVehicleRequest struct {
 	CradleLengthExtended *float64  `json:"cradleLengthExtended,omitempty" validate:"omitempty,gt=0"`
 	Special              *string   `json:"special,omitempty"`
 	RostechReg           *bool     `json:"rostechReg,omitempty"`
-	Status               *VehicleStatus `json:"status,omitempty" validate:"omitempty,oneof=active inactive blocked"`
-}
-// UpdateVehicleRequest represents the request to update a vehicle
+	Status               *VehicleStatus  `json:"status,omitempty" validate:"omitempty,oneof=active inactive blocked"`}// UpdateVehicleRequest represents the request to update a vehicle
 type UpdateVehicleRequest struct {
 	GarageNumber         *string         `json:"garageNumber,omitempty" validate:"omitempty"`
 	VIN                  *string         `json:"vin,omitempty" validate:"omitempty,len=17"`
@@ -153,9 +151,8 @@ type UpdateVehicleRequest struct {
 	Special              *string         `json:"special,omitempty"`
 	RostechReg           *bool           `json:"rostechReg,omitempty"`
 	Status               *VehicleStatus  `json:"status,omitempty" validate:"omitempty,oneof=active inactive blocked"`
-	MainImageIndex       *int            `json:"mainImageIndex,omitempty" validate:"omitempty,gte=0"`
-}
-// VehicleResponse represents the response for a vehicle
+	ImgArray             *StringArray    `json:"imgArray,omitempty"`
+MainImageIndex       *int            `json:"mainImageIndex,omitempty" validate:"omitempty,gte=0"`}// VehicleResponse represents the response for a vehicle
 type VehicleResponse struct {
 	ID                   uuid.UUID     `json:"id"`
 	GarageNumber         string        `json:"garageNumber"`
@@ -195,6 +192,9 @@ type VehicleListResponse struct {
 
 // ToResponse converts a Vehicle to VehicleResponse
 func (v *Vehicle) ToResponse() VehicleResponse {
+	// Конвертируем из 0-based (база данных) в 1-based (пользователь)
+	mainImageIndex := v.MainImageIndex + 1
+	
 	return VehicleResponse{
 		ID:                   v.ID,
 		GarageNumber:         v.GarageNumber,
@@ -217,16 +217,13 @@ func (v *Vehicle) ToResponse() VehicleResponse {
 		CradleLengthFolded:   v.CradleLengthFolded,
 		CradleLengthExtended: v.CradleLengthExtended,
 		ImgArray:             v.ImgArray,
-		MainImageIndex:       v.MainImageIndex,
+		MainImageIndex:       mainImageIndex,
 		Special:              v.Special,
 		RostechReg:           v.RostechReg,
 		Status:               v.Status,
 		CreatedAt:            v.CreatedAt,
 		UpdatedAt:            v.UpdatedAt,
-	}
-}
-
-// ToVehicle converts CreateVehicleRequest to Vehicle
+	}}// ToVehicle converts CreateVehicleRequest to Vehicle
 func (r *CreateVehicleRequest) ToVehicle() *Vehicle {
 	status := VehicleStatusActive
 	if r.Status != nil {
@@ -262,8 +259,7 @@ func (r *CreateVehicleRequest) ToVehicle() *Vehicle {
 		ImgArray:             StringArray{},
 		MainImageIndex:       1,
 		Special:              r.Special,
-		RostechReg:           rostechReg,
-		Status:               status,
+		RostechReg:           rostechReg,		Status:               status,
 		CreatedAt:            time.Now(),
 		UpdatedAt:            time.Now(),
 	}
@@ -337,8 +333,9 @@ func (v *Vehicle) UpdateVehicle(req *UpdateVehicleRequest) {
 	if req.Status != nil {
 		v.Status = *req.Status
 	}
+	if req.ImgArray != nil {
+		v.ImgArray = *req.ImgArray
+	}
 	if req.MainImageIndex != nil {
 		v.MainImageIndex = *req.MainImageIndex
-	}
-	v.UpdatedAt = time.Now()
-}
+	}	v.UpdatedAt = time.Now()}

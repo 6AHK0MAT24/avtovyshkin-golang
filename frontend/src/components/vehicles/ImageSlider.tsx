@@ -61,8 +61,8 @@ export const ImageSlider: React.FC<ImageSliderProps> = ({
       style={{ top: 20 }}
       bodyStyle={{ padding: 0 }}
       closeIcon={<CloseOutlined />}
-    >      <div
-        style={{
+    >
+      <div        style={{
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',

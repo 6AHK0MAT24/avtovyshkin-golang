@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Descriptions, Tag, Image, Space, Button, Typography, Row, Col, Popconfirm, message } from 'antd';
-import {
+import { Card, Descriptions, Tag, Image, Space, Button, Typography, Row, Col, Popconfirm } from 'antd';import {
   CarOutlined,
   EditOutlined,
   DeleteOutlined,
@@ -42,8 +41,10 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
   const [sliderVisible, setSliderVisible] = useState(false);
   const [sliderInitialIndex, setSliderInitialIndex] = useState(0);
 
-  const handleImageClick = (index: number) => {
-    setSliderInitialIndex(index);
+  const handleImageClick = () => {
+    // Конвертируем из 1-based (пользователь) в 0-based (ImageSlider)
+    const userMainIndex = vehicle.mainImageIndex || 1;
+    setSliderInitialIndex(userMainIndex - 1);
     setSliderVisible(true);
   };
 
@@ -51,18 +52,15 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
     if (onDelete) {
       try {
         await onDelete(vehicle.id);
-        message.success('Автовышка успешно удалена');
       } catch (error) {
-        message.error('Ошибка при удалении автовышки');
+        console.error('Ошибка при удалении автовышки:', error);
       }
     }
   };
-
   const mainImage =
     vehicle.imgArray && vehicle.imgArray.length > 0
-      ? vehicle.imgArray[vehicle.mainImageIndex || 0]
+      ? vehicle.imgArray[(vehicle.mainImageIndex || 1) - 1] // Конвертируем из 1-based в 0-based
       : null;
-
   return (
     <>
       <Card
@@ -114,7 +112,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
                       borderRadius: 8,
                       cursor: 'pointer',
                     }}
-                    onClick={() => handleImageClick(vehicle.mainImageIndex || 0)}
+                    onClick={() => handleImageClick()}
                     preview={false}
                   />                  {vehicle.imgArray && vehicle.imgArray.length > 1 && (
                     <Text type="secondary" style={{ display: 'block', marginTop: 8, textAlign: 'center' }}>
@@ -263,27 +261,75 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
             </Col>
           )}
 
-          {/* Информация о создании/обновлении */}
-          <Col xs={24}>
-            <div style={{ textAlign: 'center', marginTop: 16 }}>
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                Создано: {new Date(vehicle.createdAt).toLocaleString('ru-RU')} | Обновлено:{' '}
-                {new Date(vehicle.updatedAt).toLocaleString('ru-RU')}
-              </Text>
-            </div>
-          </Col>
+          {/* Галерея всех изображений */}
+          {vehicle.imgArray && vehicle.imgArray.length > 1 && (
+            <Col xs={24}>
+              <Card size="small" title={<Space><CarOutlined />Все фото ({vehicle.imgArray.length})</Space>}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                    gap: '12px',
+                  }}
+                >
+                  {vehicle.imgArray.map((img, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        position: 'relative',
+                        aspectRatio: '1',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        border: (vehicle.mainImageIndex || 1) === index + 1 ? '3px solid #1890ff' : '2px solid #d9d9d9',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => {
+                        setSliderInitialIndex(index);
+                        setSliderVisible(true);
+                      }}
+                    >
+                      <img
+                        src={`http://localhost:8081${img}`}
+                        alt={`Фото ${index + 1}`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                      {(vehicle.mainImageIndex || 1) === index + 1 && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            backgroundColor: 'rgba(24, 144, 255, 0.9)',
+                            color: 'white',
+                            textAlign: 'center',
+                            padding: '4px 8px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Основное
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </Col>
+          )}
         </Row>
       </Card>
-
-      {/* Слайдер изображений */}
-      {vehicle.imgArray && vehicle.imgArray.length > 0 && (
-        <ImageSlider
-          images={vehicle.imgArray}
-          initialIndex={sliderInitialIndex}
-          visible={sliderVisible}
-          onClose={() => setSliderVisible(false)}
-        />
-      )}
+      {/* Галерея изображений */}
+      <ImageSlider
+        images={vehicle.imgArray || []}
+        initialIndex={sliderInitialIndex}
+        visible={sliderVisible}
+        onClose={() => setSliderVisible(false)}
+      />
     </>
   );
 };

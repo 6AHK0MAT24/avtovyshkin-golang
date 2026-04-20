@@ -7,6 +7,7 @@ Write-Host "Starting Vehicles Microservice with hot reload..." -ForegroundColor 
 Write-Host "Using MySQL database on localhost:3306" -ForegroundColor Cyan
 # Change to vehicles microservice directory
 $vehiclesDir = "backend/vehicles-microservice"
+
 if (-not (Test-Path $vehiclesDir)) {
     Write-Host "Error: Directory $vehiclesDir not found!" -ForegroundColor Red
     exit 1

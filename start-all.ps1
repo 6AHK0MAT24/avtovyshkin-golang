@@ -8,7 +8,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Starting Avtovyshkin Project" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Using MySQL on REG.RU (localhost:3306)" -ForegroundColor Yellow
+Write-Host "Using MySQL (localhost:3306)" -ForegroundColor Yellow
 Write-Host ""
 # Start drivers service in new window
 Write-Host "[1/3] Starting Drivers Service..." -ForegroundColor Yellow
