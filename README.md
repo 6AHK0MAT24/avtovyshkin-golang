@@ -1,9 +1,8 @@
 # Автовышкин - Система управления водителями и автовышками
 
-Микросервисная система для управления водителями и автовышками с использованием Go, React и PostgreSQL.
+Микросервисная система для управления водителями и автовышками с использованием Go, React и MySQL.
 
-## Структура проекта
-
+**⚠️ Важно:** Проект использует MySQL базу данных. Локальная разработка использует MySQL через OpenServer на localhost:3306.## Структура проекта
 ```
 avtovyshkin-golang/
 ├── backend/
@@ -46,26 +45,23 @@ avtovyshkin-golang/
 │   │   └── utils/           # Утилиты
 │   ├── package.json
 │   └── vite.config.ts
-├── docker-compose.yml        # Docker Compose конфигурация
-└── README.md
-```
+└── README.md```
 
 ## Технологический стек
 
 ### Drivers Service (Backend)
-- **Go 1.21** - Язык программирования
-- **PostgreSQL 13.3** - База данных
+- **Go 1.23** - Язык программирования
+- **MySQL** - База данных
 - **Gorilla Mux** - HTTP роутер
 - **Gorilla WebSocket** - WebSocket для real-time
-- **lib/pq** - PostgreSQL драйвер
+- **go-sql-driver/mysql** - MySQL драйвер
 
 ### Vehicles Service (Backend)
-- **Go 1.21** - Язык программирования
-- **PostgreSQL 13.3** - База данных
+- **Go 1.23** - Язык программирования
+- **MySQL** - База данных
 - **Gorilla Mux** - HTTP роутер
 - **Gorilla WebSocket** - WebSocket для real-time
-- **sqlx** - PostgreSQL драйвер
-
+- **sqlx** - MySQL драйвер
 ### Frontend
 - **React 19** - UI библиотека
 - **TypeScript** - Типизация
@@ -79,22 +75,32 @@ avtovyshkin-golang/
 ## Быстрый старт
 
 ### Требования
-- Docker и Docker Compose
-- Go 1.21+ (для локальной разработки)
+- Go 1.23+ (для локальной разработки)
 - Node.js 18+ (для локальной разработки)
 - Yarn (для локальной разработки)
+- MySQL (OpenServer или другой MySQL сервер)
 
-### Запуск с Docker Compose
+### Локальная разработка
 
-```bash
-# Запуск всех сервисов
-docker-compose up -d
+#### Быстрый запуск с PowerShell скриптами
 
-# Просмотр логов
-docker-compose logs -f
+Для удобного запуска проекта используйте готовые скрипты:
 
-# Остановка сервисов
-docker-compose down
+```powershell
+# Запуск всего проекта (Backend + Frontend)
+.\start-all.ps1
+
+# Запуск только Backend
+.\start-backend.ps1
+
+# Запуск только Vehicles Service
+.\start-vehicles.ps1
+
+# Запуск только Frontend
+.\start-frontend.ps1
+
+# Остановка всех сервисов
+.\stop-all.ps1
 ```
 
 ### Локальная разработка
@@ -207,30 +213,32 @@ yarn dev
 
 ```
 DB_HOST=localhost
-DB_PORT=54320
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=avtovyshkin_db_go
-SERVER_PORT=8080
+DB_PORT=3306
+DB_USER=u3424187_root_avtovyshkin
+DB_PASSWORD=JavaScript6315
+DB_NAME=u3424187_avtovyshkin
+SERVER_PORT=8082
 UPLOAD_DIR=./uploads
 MAX_UPLOAD_SIZE=10485760
+```
 ```
 
 ### Frontend (.env)
 
 ```
-VITE_API_BASE_URL=http://localhost:8080
-VITE_WS_BASE_URL=ws://localhost:8080
+VITE_API_BASE_URL=http://localhost:8082
+VITE_WS_BASE_URL=ws://localhost:8082
+```
 ```
 
 ## Миграции базы данных
 
 ```bash
-cd drivers-service
+cd backend/drivers-microservice
 
-# Применить миграции
-psql -h localhost -p 54320 -U postgres -d avtovyshkin_db_go -f migrations/000_create_update_timestamp_function.sql
-psql -h localhost -p 54320 -U postgres -d avtovyshkin_db_go -f migrations/001_create_drivers_table.sql
+# Применить миграции MySQL
+mysql -h localhost -u u3424187_root_avtovyshkin -p u3424187_avtovyshkin < migrations-mysql/001_create_drivers_table.sql
+```
 ```
 
 ## Разработка

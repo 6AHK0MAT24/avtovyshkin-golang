@@ -1,21 +1,16 @@
 # Script to start vehicles microservice with hot reload
 
-Write-Host "Starting Vehicles Microservice with hot reload..." -ForegroundColor Green
+# Set window title
+$Host.UI.RawUI.WindowTitle = "Vehicles Microservice"
 
-# Check if PostgreSQL is running
-$postgresRunning = docker ps --filter "name=avtovyshkin-postgres" --format "{{.Names}}"
-if (-not $postgresRunning) {
-    Write-Host "PostgreSQL is not running. Starting..." -ForegroundColor Yellow
-    docker-compose -f docker-compose.dev.yml up -d postgres
-    Start-Sleep -Seconds 5
-}
+Write-Host "Starting Vehicles Microservice with hot reload..." -ForegroundColor Green
+Write-Host "Using MySQL database on localhost:3306" -ForegroundColor Cyan
 # Change to vehicles microservice directory
 $vehiclesDir = "backend/vehicles-microservice"
 if (-not (Test-Path $vehiclesDir)) {
     Write-Host "Error: Directory $vehiclesDir not found!" -ForegroundColor Red
     exit 1
 }
-
 Set-Location $vehiclesDir
 
 # Check port 8081

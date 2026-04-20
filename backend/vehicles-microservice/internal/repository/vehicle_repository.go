@@ -74,7 +74,7 @@ func (r *vehicleRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.
 			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
 			fldcreatedat, fldupdatedat
 		FROM vehicles
-		WHERE fldid = $1
+		WHERE fldid = ?
 	`
 
 	var vehicle models.Vehicle
@@ -109,7 +109,7 @@ func (r *vehicleRepository) GetAll(ctx context.Context, limit, offset int) ([]*m
 			fldcreatedat, fldupdatedat
 		FROM vehicles
 		ORDER BY fldcreatedat DESC
-		LIMIT $1 OFFSET $2
+		LIMIT ? OFFSET ?
 	`
 	var vehicles []*models.Vehicle
 	err = r.db.SelectContext(ctx, &vehicles, query, limit, offset)
@@ -170,7 +170,7 @@ func (r *vehicleRepository) Update(ctx context.Context, vehicle *models.Vehicle)
 }
 // Delete removes a vehicle from the database
 func (r *vehicleRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	query := `DELETE FROM vehicles WHERE fldid = $1`
+	query := `DELETE FROM vehicles WHERE fldid = ?`
 
 	result, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
@@ -197,13 +197,13 @@ func (r *vehicleRepository) Search(ctx context.Context, query string, limit, off
 	}
 
 	// Build search query
-	whereClause := `WHERE (fldgaragenumber ILIKE $1 OR CAST(fldheight AS VARCHAR) ILIKE $1)`
+	whereClause := `WHERE (fldgaragenumber LIKE ? OR CAST(fldheight AS CHAR) LIKE ?)`
 	searchParam := "%" + searchQuery + "%"
 
 	// Get total count
 	var total int64
 	countQuery := `SELECT COUNT(*) FROM vehicles ` + whereClause
-	err := r.db.GetContext(ctx, &total, countQuery, searchParam)
+	err := r.db.GetContext(ctx, &total, countQuery, searchParam, searchParam)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to count search results: %w", err)
 	}
@@ -220,15 +220,14 @@ func (r *vehicleRepository) Search(ctx context.Context, query string, limit, off
 		FROM vehicles
 		` + whereClause + `
 		ORDER BY fldcreatedat DESC
-		LIMIT $2 OFFSET $3
+		LIMIT ? OFFSET ?
 	`
 
 	var vehicles []*models.Vehicle
-	err = r.db.SelectContext(ctx, &vehicles, selectQuery, searchParam, limit, offset)
+	err = r.db.SelectContext(ctx, &vehicles, selectQuery, searchParam, searchParam, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to search vehicles: %w", err)
 	}
-
 	return vehicles, total, nil
 }
 // GetByGarageNumber retrieves a vehicle by its garage number
@@ -242,7 +241,7 @@ func (r *vehicleRepository) GetByGarageNumber(ctx context.Context, garageNumber 
 			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
 			fldcreatedat, fldupdatedat
 		FROM vehicles
-		WHERE fldgaragenumber = $1
+		WHERE fldgaragenumber = ?
 	`
 
 	var vehicle models.Vehicle
@@ -258,8 +257,8 @@ func (r *vehicleRepository) GetByGarageNumber(ctx context.Context, garageNumber 
 }
 
 // GetByVIN retrieves a vehicle by its VIN
-func (r *vehicleRepository) GetByVIN(ctx context.Context, vin string) (*models.Vehicle, error) {	query := `
-		SELECT
+func (r *vehicleRepository) GetByVIN(ctx context.Context, vin string) (*models.Vehicle, error) {
+	query := `		SELECT
 			fldid, fldgaragenumber, fldvin, fldheight, fldtype, fldpower,
 			fldprice5, fldprice22, flddescription, fldbrand, fldmachine,
 			fldlength, fldwidth, fldheightts, fldwidthwithsupports, fldmass,
@@ -267,7 +266,7 @@ func (r *vehicleRepository) GetByVIN(ctx context.Context, vin string) (*models.V
 			fldimgarray, fldmainimageindex, fldspecial, fldrostechreg, fldstatus,
 			fldcreatedat, fldupdatedat
 		FROM vehicles
-		WHERE fldvin = $1
+		WHERE fldvin = ?
 	`
 
 	var vehicle models.Vehicle
@@ -283,7 +282,8 @@ func (r *vehicleRepository) GetByVIN(ctx context.Context, vin string) (*models.V
 }
 
 // Close closes the database connection
-func (r *vehicleRepository) Close() error {	if r.db != nil {
+func (r *vehicleRepository) Close() error {
+	if r.db != nil {
 		return r.db.Close()
 	}
 	return nil

@@ -1,0 +1,52 @@
+# Export PostgreSQL data to CSV with UTF-8 encoding
+Write-Host "=== Export PostgreSQL Data (UTF-8) ===" -ForegroundColor Green
+
+Write-Host "`nExporting drivers table..." -ForegroundColor Yellow
+$driversQuery = @"
+COPY (
+    SELECT 
+        fldId, fldFirstName, fldLastName, fldMiddleName, fldPhone, fldEmail,
+        fldBirthDate, fldPhoto, fldDriverLicenseNumber, fldDriverLicenseIssueDate,
+        fldDriverLicenseExpiryDate, fldDriverLicensePhoto, fldDriverLicenseScan,
+        fldPassportSeries, fldPassportNumber, fldPassportIssueDate,
+        fldPassportPhoto, fldPassportScan, fldAddress, fldExperienceYears,
+        fldStatus, fldCreatedAt, fldUpdatedAt
+    FROM drivers
+) TO STDOUT WITH CSV HEADER DELIMITER ',' ENCODING 'UTF8'
+"@
+
+docker exec avtovyshkin-postgres psql -U postgres -d avtovyshkin_db_go -c $driversQuery | Out-File -FilePath "drivers_export.csv" -Encoding UTF8
+
+Write-Host "Exporting vehicles table..." -ForegroundColor Yellow
+$vehiclesQuery = @"
+COPY (
+    SELECT 
+        fldId, fldGarageNumber, fldVIN, fldHeight, fldType, fldPower, 
+        fldPrice5, fldPrice22, fldDescription, fldBrand, fldMachine,
+        fldLength, fldWidth, fldHeightTs, fldWidthWithSupports, fldMass,
+        fldCradleWidthFolded, fldCradleWidthExtended, fldCradleLengthFolded, 
+        fldCradleLengthExtended, fldImgArray, fldMainImageIndex, 
+        fldSpecial, fldRostechReg, fldStatus, fldCreatedAt, fldUpdatedAt
+    FROM vehicles
+) TO STDOUT WITH CSV HEADER DELIMITER ',' ENCODING 'UTF8'
+"@
+
+docker exec avtovyshkin-postgres psql -U postgres -d avtovyshkin_db_go -c $vehiclesQuery | Out-File -FilePath "vehicles_export.csv" -Encoding UTF8
+
+Write-Host "`nChecking files..." -ForegroundColor Yellow
+if (Test-Path drivers_export.csv) {
+    $lines = (Get-Content drivers_export.csv).Count
+    Write-Host "drivers_export.csv: $lines lines" -ForegroundColor Green
+}
+if (Test-Path vehicles_export.csv) {
+    $lines = (Get-Content vehicles_export.csv).Count
+    Write-Host "vehicles_export.csv: $lines lines" -ForegroundColor Green
+}
+
+Write-Host "`nPreview of drivers_export.csv:" -ForegroundColor Yellow
+Get-Content drivers_export.csv -Encoding UTF8 | Select-Object -First 2
+
+Write-Host "`n=== Export Complete ===" -ForegroundColor Green
+Write-Host "Files ready for import to REG.RU MySQL:" -ForegroundColor Cyan
+Write-Host "  - drivers_export.csv" -ForegroundColor White
+Write-Host "  - vehicles_export.csv" -ForegroundColor White

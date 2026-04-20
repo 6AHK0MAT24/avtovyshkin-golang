@@ -58,14 +58,18 @@ func (vs *VehicleStatus) Scan(value interface{}) error {
 		*vs = VehicleStatusActive
 		return nil
 	}
-	str, ok := value.(string)
-	if !ok {
+	var str string
+	switch v := value.(type) {
+	case string:
+		str = v
+	case []byte:
+		str = string(v)
+	default:
 		return errors.New("invalid type for VehicleStatus")
 	}
 	*vs = VehicleStatus(str)
 	return nil
 }
-
 // IsValid checks if the vehicle status is valid
 func (vs VehicleStatus) IsValid() bool {
 	switch vs {

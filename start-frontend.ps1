@@ -1,7 +1,9 @@
 # Script to start frontend application
 
-Write-Host "Starting Frontend application..." -ForegroundColor Green
+# Set window title
+$Host.UI.RawUI.WindowTitle = "Frontend"
 
+Write-Host "Starting Frontend application..." -ForegroundColor Green
 # Change to frontend directory
 $frontendDir = "frontend"
 if (-not (Test-Path $frontendDir)) {

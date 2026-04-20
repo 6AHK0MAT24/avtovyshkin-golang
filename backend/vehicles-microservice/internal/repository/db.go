@@ -5,18 +5,18 @@ import (
 	"log"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
 	"vehicles-service/internal/config"
 )
 
 // InitDB initializes database connection from config
 func InitDB(cfg *config.DatabaseConfig) (*sqlx.DB, error) {
-	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode,
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName,
 	)
 
-	db, err := sqlx.Connect("postgres", connStr)
+	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}

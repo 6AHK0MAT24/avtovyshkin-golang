@@ -56,14 +56,18 @@ func (ds *DriverStatus) Scan(value interface{}) error {
 		*ds = DriverStatusActive
 		return nil
 	}
-	str, ok := value.(string)
-	if !ok {
+	var str string
+	switch v := value.(type) {
+	case string:
+		str = v
+	case []byte:
+		str = string(v)
+	default:
 		return errors.New("invalid type for DriverStatus")
 	}
 	*ds = DriverStatus(str)
 	return nil
 }
-
 // IsValid checks if the driver status is valid
 func (ds DriverStatus) IsValid() bool {
 	switch ds {

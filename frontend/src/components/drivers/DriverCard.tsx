@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, Descriptions, Tag, Image, Space, Button, Typography, Row, Col } from 'antd';
-import { 
-  UserOutlined, 
-  PhoneOutlined, 
-  MailOutlined, 
-  IdcardOutlined, 
+import {
+  UserOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  IdcardOutlined,
   SafetyOutlined,
   EnvironmentOutlined,
   CalendarOutlined,
@@ -13,8 +13,10 @@ import {
 } from '@ant-design/icons';
 import type { Driver } from '../../types/driver';
 import dayjs from 'dayjs';
+
 const { Title, Text } = Typography;
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
 interface DriverCardProps {
   driver: Driver;
   onEdit?: (driver: Driver) => void;
@@ -172,7 +174,7 @@ export const DriverCard: React.FC<DriverCardProps> = ({
                 <div style={{ marginTop: 8 }}>
                   <Image
                     width={200}
-                    src={driver.driverLicensePhoto}
+                    src={`${API_BASE_URL}${driver.driverLicensePhoto}`}
                     alt="Фото водительских прав"
                     style={{ borderRadius: 8 }}
                   />
@@ -186,14 +188,13 @@ export const DriverCard: React.FC<DriverCardProps> = ({
                 <div style={{ marginTop: 8 }}>
                   <Image
                     width={200}
-                    src={driver.driverLicenseScan}
+                    src={`${API_BASE_URL}${driver.driverLicenseScan}`}
                     alt="Скан водительских прав"
                     style={{ borderRadius: 8 }}
                   />
                 </div>
               </div>
-            )}
-          </Card>
+            )}          </Card>
         </Col>
 
         {/* Паспорт */}
@@ -223,7 +224,7 @@ export const DriverCard: React.FC<DriverCardProps> = ({
                   <div style={{ marginTop: 8 }}>
                     <Image
                       width={200}
-                      src={driver.passportPhoto}
+                      src={`${API_BASE_URL}${driver.passportPhoto}`}
                       alt="Фото паспорта"
                       style={{ borderRadius: 8 }}
                     />
@@ -237,14 +238,13 @@ export const DriverCard: React.FC<DriverCardProps> = ({
                   <div style={{ marginTop: 8 }}>
                     <Image
                       width={200}
-                      src={driver.passportScan}
+                      src={`${API_BASE_URL}${driver.passportScan}`}
                       alt="Скан паспорта"
                       style={{ borderRadius: 8 }}
                     />
                   </div>
                 </div>
-              )}
-            </Card>
+              )}            </Card>
           </Col>
         )}
 

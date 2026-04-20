@@ -293,8 +293,12 @@ func (s *driverService) UploadDriverPhoto(ctx context.Context, id uuid.UUID, fil
 		return "", fmt.Errorf("failed to get driver: %w", err)
 	}
 
-	// Use driver-specific photo directory
-	photoDir := "./uploads/drivers/photo"
+	// Create driver-specific directories
+	uploadDir := "./uploads"
+	photoDir, _, _, err := utils.CreateDriverDirectories(uploadDir, driver.ID.String())
+	if err != nil {
+		return "", fmt.Errorf("failed to create driver directories: %w", err)
+	}
 
 	// Delete old photo if exists
 	if driver.Photo != nil {
@@ -322,8 +326,7 @@ func (s *driverService) UploadDriverPhoto(ctx context.Context, id uuid.UUID, fil
 	}
 
 	return filePath, nil
-}
-// UploadDriverLicense uploads driver license document
+}// UploadDriverLicense uploads driver license document
 func (s *driverService) UploadDriverLicense(ctx context.Context, id uuid.UUID, fileData []byte, filename string, fileType string) (string, error) {
 	// Get driver
 	driver, err := s.repo.GetByID(ctx, id)
@@ -331,9 +334,12 @@ func (s *driverService) UploadDriverLicense(ctx context.Context, id uuid.UUID, f
 		return "", fmt.Errorf("failed to get driver: %w", err)
 	}
 
-	// Use shared license directory
-	licenseDir := "./uploads/drivers/license"
-
+	// Create driver-specific directories
+	uploadDir := "./uploads"
+	_, licenseDir, _, err := utils.CreateDriverDirectories(uploadDir, driver.ID.String())
+	if err != nil {
+		return "", fmt.Errorf("failed to create driver directories: %w", err)
+	}
 	// Delete old file if exists
 	var oldFilePath *string
 	if fileType == "photo" {
@@ -381,9 +387,12 @@ func (s *driverService) UploadDriverPassport(ctx context.Context, id uuid.UUID, 
 		return "", fmt.Errorf("failed to get driver: %w", err)
 	}
 
-	// Use shared passport directory
-	passportDir := "./uploads/drivers/passport"
-
+	// Create driver-specific directories
+	uploadDir := "./uploads"
+	_, _, passportDir, err := utils.CreateDriverDirectories(uploadDir, driver.ID.String())
+	if err != nil {
+		return "", fmt.Errorf("failed to create driver directories: %w", err)
+	}
 	// Delete old file if exists
 	var oldFilePath *string
 	if fileType == "photo" {

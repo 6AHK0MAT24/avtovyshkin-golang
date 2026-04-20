@@ -12,8 +12,9 @@ import {  useCreateDriver,
   useDeleteDriverPassport,
 } from '../../hooks/useDrivers';
 import type { Driver, CreateDriverRequest, UpdateDriverRequest } from '../../types/driver';
+
 const { Option } = Select;
-interface DriverFormProps {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';interface DriverFormProps {
   driver?: Driver;
   onSuccess: () => void;
   onCancel: () => void;
@@ -251,7 +252,7 @@ const handlePhotoDelete = async () => {
               {photoUrl ? (
                 <div style={{ position: 'relative' }}>
                   <Image
-                    src={photoUrl.startsWith('data:') ? photoUrl : `http://localhost:8080${photoUrl}`}
+                    src={photoUrl.startsWith('data:') ? photoUrl : `${API_BASE_URL}${photoUrl}`}
                     alt="Фото водителя"
                     width={120}
                     height={120}
@@ -259,8 +260,7 @@ const handlePhotoDelete = async () => {
                     preview={{
                       mask: 'Просмотр',
                     }}
-                  />
-                  <div style={{ position: 'absolute', top: -8, right: -8, display: 'flex', gap: 4 }}>
+                  />                  <div style={{ position: 'absolute', top: -8, right: -8, display: 'flex', gap: 4 }}>
                     <input
                       type="file"
                       accept="image/*"
@@ -400,14 +400,13 @@ const handlePhotoDelete = async () => {
               {licenseScanUrl ? (
                 <div style={{ position: 'relative' }}>
                   <Image
-                    src={licenseScanUrl.startsWith('data:') ? licenseScanUrl : `http://localhost:8080${licenseScanUrl}`}
+                    src={licenseScanUrl.startsWith('data:') ? licenseScanUrl : `${API_BASE_URL}${licenseScanUrl}`}
                     alt="Скан прав"
                     width={120}
                     height={120}
                     style={{ objectFit: 'cover', borderRadius: 8 }}
                     preview={{ mask: 'Просмотр' }}
-                  />
-                  <div style={{ position: 'absolute', top: -8, right: -8, display: 'flex', gap: 4 }}>
+                  />                  <div style={{ position: 'absolute', top: -8, right: -8, display: 'flex', gap: 4 }}>
                     <input
                       type="file"
                       accept="image/*"
@@ -538,14 +537,13 @@ const handlePhotoDelete = async () => {
               {passportScanUrl ? (
                 <div style={{ position: 'relative' }}>
                   <Image
-                    src={passportScanUrl.startsWith('data:') ? passportScanUrl : `http://localhost:8080${passportScanUrl}`}
+                    src={passportScanUrl.startsWith('data:') ? passportScanUrl : `${API_BASE_URL}${passportScanUrl}`}
                     alt="Скан паспорта"
                     width={120}
                     height={120}
                     style={{ objectFit: 'cover', borderRadius: 8 }}
                     preview={{ mask: 'Просмотр' }}
-                  />
-                  <div style={{ position: 'absolute', top: -8, right: -8, display: 'flex', gap: 4 }}>
+                  />                  <div style={{ position: 'absolute', top: -8, right: -8, display: 'flex', gap: 4 }}>
                     <input
                       type="file"
                       accept="image/*"

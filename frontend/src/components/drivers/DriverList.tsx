@@ -3,12 +3,18 @@ import { Table, Button, Space, Tag, Popconfirm, message, Image } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useDrivers, useDeleteDriver } from '../../hooks/useDrivers';
 import type { Driver, DriverStatus } from '../../types/driver';
-import type { ColumnsType } from 'antd/es/table';interface DriverListProps {
+import type { ColumnsType } from 'antd/es/table';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
+
+interface DriverListProps {
   onEdit: (driver: Driver) => void;
   onView?: (driver: Driver) => void;
   searchQuery?: string;
   searchStatus?: DriverStatus;
-}const statusColors: Record<DriverStatus, string> = {
+}
+
+const statusColors: Record<DriverStatus, string> = {
   active: 'green',
   inactive: 'orange',
   blocked: 'red',
@@ -25,11 +31,13 @@ export const DriverList: React.FC<DriverListProps> = ({
   onView,
   searchQuery = '',
   searchStatus,
-}) => {  const [page, setPage] = useState(1);
+}) => {
+  const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const { data, isLoading, error } = useDrivers(page, pageSize);
   const deleteDriver = useDeleteDriver();
+
   const handleDelete = async (id: string) => {
     try {
       await deleteDriver.mutateAsync(id);
@@ -54,8 +62,7 @@ export const DriverList: React.FC<DriverListProps> = ({
 
       return matchesQuery && matchesStatus;
     })
-    .sort((a, b) => a.lastName.localeCompare(b.lastName));
-  const columns: ColumnsType<Driver> = [
+    .sort((a, b) => a.lastName.localeCompare(b.lastName));  const columns: ColumnsType<Driver> = [
     {
       title: 'Фото',
       dataIndex: 'photo',
@@ -64,7 +71,7 @@ export const DriverList: React.FC<DriverListProps> = ({
       render: (photo) => (
         photo ? (
           <Image
-            src={`http://localhost:8080${photo}`}
+            src={`${API_BASE_URL}${photo}`}
             alt="Фото водителя"
             width={50}
             height={50}
@@ -94,7 +101,9 @@ export const DriverList: React.FC<DriverListProps> = ({
             Нет фото
           </div>
         )
-      ),    },    {
+      ),
+    },
+    {
       title: 'ФИО',
       dataIndex: 'lastName',
       key: 'fullName',
@@ -111,12 +120,11 @@ export const DriverList: React.FC<DriverListProps> = ({
       key: 'email',
       render: (email) => email || '-',
     },
-{
+    {
       title: '№ ВУ',
       dataIndex: 'driverLicenseNumber',
       key: 'driverLicenseNumber',
-    },
-    {
+    },    {
       title: 'Срок действия ВУ',
       dataIndex: 'driverLicenseExpiryDate',
       key: 'driverLicenseExpiryDate',
@@ -136,14 +144,16 @@ export const DriverList: React.FC<DriverListProps> = ({
       dataIndex: 'experienceYears',
       key: 'experienceYears',
       render: (years) => `${years} лет`,
-    },{
+    },
+    {
       title: 'Статус',
       dataIndex: 'status',
       key: 'status',
       render: (status: DriverStatus) => (
         <Tag color={statusColors[status]}>{statusLabels[status]}</Tag>
       ),
-    },    {
+    },
+    {
       title: 'Действия',
       key: 'actions',
       render: (_, record) => (
@@ -155,19 +165,19 @@ export const DriverList: React.FC<DriverListProps> = ({
           >
             Редактировать
           </Button>
-<Popconfirm
+          <Popconfirm
             title="Вы уверены, что хотите удалить этого водителя?"
             onConfirm={() => handleDelete(record.id)}
             okText="Ок"
             cancelText="Отмена"
-          >            <Button type="link" danger icon={<DeleteOutlined />}>
+          >
+            <Button type="link" danger icon={<DeleteOutlined />}>
               Удалить
             </Button>
           </Popconfirm>
         </Space>
       ),
-    },
-  ];
+    },  ];
 
   if (error) {
     return <div>Ошибка загрузки данных</div>;
@@ -191,6 +201,7 @@ export const DriverList: React.FC<DriverListProps> = ({
             setPageSize(newPageSize || 10);
           },
         }}
-      />    </div>
+      />
+    </div>
   );
 };

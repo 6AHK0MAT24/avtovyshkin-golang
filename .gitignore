@@ -60,10 +60,6 @@ build/
 .next/
 out/
 
-# Docker
-.dockerignore
-
-# Database
-*.db
+# Database*.db
 *.sqlite
 *.sqlite3

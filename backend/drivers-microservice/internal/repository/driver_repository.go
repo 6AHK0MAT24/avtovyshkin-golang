@@ -10,9 +10,8 @@ import (
 	"drivers-service/internal/models"
 
 	"github.com/google/uuid"
-	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
 )
-
 // DriverRepository defines the interface for driver data operations
 type DriverRepository interface {
 	Create(ctx context.Context, driver *models.Driver) error
@@ -34,12 +33,12 @@ type driverRepository struct {
 
 // NewDriverRepository creates a new driver repository
 func NewDriverRepository(cfg *config.DatabaseConfig) (DriverRepository, error) {
-	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode,
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName,
 	)
 
-	db, err := sql.Open("postgres", connStr)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
@@ -56,7 +55,6 @@ func NewDriverRepository(cfg *config.DatabaseConfig) (DriverRepository, error) {
 
 	return &driverRepository{db: db}, nil
 }
-
 // Create creates a new driver in the database
 func (r *driverRepository) Create(ctx context.Context, driver *models.Driver) error {
 	query := `
@@ -67,9 +65,8 @@ func (r *driverRepository) Create(ctx context.Context, driver *models.Driver) er
 			fldPassportSeries, fldPassportNumber, fldPassportIssueDate,
 			fldPassportPhoto, fldPassportScan, fldAddress, fldExperienceYears,
 			fldStatus, fldCreatedAt, fldUpdatedAt
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
-
 	_, err := r.db.ExecContext(ctx, query,
 		driver.ID, driver.FirstName, driver.LastName, driver.MiddleName, driver.Phone, driver.Email,
 		driver.BirthDate, driver.Photo, driver.DriverLicenseNumber, driver.DriverLicenseIssueDate,
@@ -96,9 +93,8 @@ func (r *driverRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.D
 			fldPassportPhoto, fldPassportScan, fldAddress, fldExperienceYears,
 			fldStatus, fldCreatedAt, fldUpdatedAt
 		FROM drivers
-		WHERE fldId = $1
+		WHERE fldId = ?
 	`
-
 	driver := &models.Driver{}
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&driver.ID, &driver.FirstName, &driver.LastName, &driver.MiddleName, &driver.Phone, &driver.Email,
@@ -138,9 +134,8 @@ func (r *driverRepository) GetAll(ctx context.Context, limit, offset int) ([]mod
 			fldStatus, fldCreatedAt, fldUpdatedAt
 		FROM drivers
 		ORDER BY fldCreatedAt DESC
-		LIMIT $1 OFFSET $2
+		LIMIT ? OFFSET ?
 	`
-
 	rows, err := r.db.QueryContext(ctx, query, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to query drivers: %w", err)
@@ -174,30 +169,29 @@ func (r *driverRepository) GetAll(ctx context.Context, limit, offset int) ([]mod
 func (r *driverRepository) Update(ctx context.Context, driver *models.Driver) error {
 	query := `
 		UPDATE drivers SET
-			fldFirstName = $1,
-			fldLastName = $2,
-			fldMiddleName = $3,
-			fldPhone = $4,
-			fldEmail = $5,
-			fldBirthDate = $6,
-			fldPhoto = $7,
-			fldDriverLicenseNumber = $8,
-			fldDriverLicenseIssueDate = $9,
-			fldDriverLicenseExpiryDate = $10,
-			fldDriverLicensePhoto = $11,
-			fldDriverLicenseScan = $12,
-			fldPassportSeries = $13,
-			fldPassportNumber = $14,
-			fldPassportIssueDate = $15,
-			fldPassportPhoto = $16,
-			fldPassportScan = $17,
-			fldAddress = $18,
-			fldExperienceYears = $19,
-			fldStatus = $20,
-			fldUpdatedAt = $21
-		WHERE fldId = $22
+			fldFirstName = ?,
+			fldLastName = ?,
+			fldMiddleName = ?,
+			fldPhone = ?,
+			fldEmail = ?,
+			fldBirthDate = ?,
+			fldPhoto = ?,
+			fldDriverLicenseNumber = ?,
+			fldDriverLicenseIssueDate = ?,
+			fldDriverLicenseExpiryDate = ?,
+			fldDriverLicensePhoto = ?,
+			fldDriverLicenseScan = ?,
+			fldPassportSeries = ?,
+			fldPassportNumber = ?,
+			fldPassportIssueDate = ?,
+			fldPassportPhoto = ?,
+			fldPassportScan = ?,
+			fldAddress = ?,
+			fldExperienceYears = ?,
+			fldStatus = ?,
+			fldUpdatedAt = ?
+		WHERE fldId = ?
 	`
-
 	result, err := r.db.ExecContext(ctx, query,
 		driver.FirstName, driver.LastName, driver.MiddleName, driver.Phone, driver.Email,
 		driver.BirthDate, driver.Photo, driver.DriverLicenseNumber, driver.DriverLicenseIssueDate,
@@ -224,7 +218,7 @@ func (r *driverRepository) Update(ctx context.Context, driver *models.Driver) er
 }
 // Delete deletes a driver by ID
 func (r *driverRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	query := "DELETE FROM drivers WHERE fldId = $1"
+	query := "DELETE FROM drivers WHERE fldId = ?"
 
 	result, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
@@ -255,22 +249,20 @@ func (r *driverRepository) Search(ctx context.Context, query string, status *mod
 			fldPassportPhoto, fldPassportScan, fldAddress, fldExperienceYears,
 			fldStatus, fldCreatedAt, fldUpdatedAt
 		FROM drivers
-		WHERE ($1 = '' OR
-			LOWER(fldFirstName) LIKE LOWER($1) OR
-			LOWER(fldLastName) LIKE LOWER($1) OR
-			LOWER(fldMiddleName) LIKE LOWER($1) OR
-			LOWER(fldPhone) LIKE LOWER($1) OR
-			LOWER(fldEmail) LIKE LOWER($1) OR
-			LOWER(fldDriverLicenseNumber) LIKE LOWER($1))
+		WHERE (? = '' OR
+			LOWER(fldFirstName) LIKE LOWER(?) OR
+			LOWER(fldLastName) LIKE LOWER(?) OR
+			LOWER(fldMiddleName) LIKE LOWER(?) OR
+			LOWER(fldPhone) LIKE LOWER(?) OR
+			LOWER(fldEmail) LIKE LOWER(?) OR
+			LOWER(fldDriverLicenseNumber) LIKE LOWER(?))
 	`
 
-	args := []interface{}{"%" + query + "%"}
-	argCount := 1
+	args := []interface{}{"%" + query + "%", "%" + query + "%", "%" + query + "%", "%" + query + "%", "%" + query + "%", "%" + query + "%", "%" + query + "%", "%" + query + "%"}
 
 	if status != nil {
-		searchQuery += fmt.Sprintf(" AND fldStatus = $%d", argCount+1)
+		searchQuery += " AND fldStatus = ?"
 		args = append(args, *status)
-		argCount++
 	}
 
 	// Get total count
@@ -282,7 +274,7 @@ func (r *driverRepository) Search(ctx context.Context, query string, status *mod
 
 	// Add ordering and pagination
 	searchQuery += " ORDER BY fldCreatedAt DESC"
-	searchQuery += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argCount+1, argCount+2)
+	searchQuery += " LIMIT ? OFFSET ?"
 	args = append(args, limit, offset)
 
 	rows, err := r.db.QueryContext(ctx, searchQuery, args...)
@@ -313,8 +305,7 @@ func (r *driverRepository) Search(ctx context.Context, query string, status *mod
 	}
 
 	return drivers, total, nil
-}
-// GetByPhone retrieves a driver by phone number
+}// GetByPhone retrieves a driver by phone number
 func (r *driverRepository) GetByPhone(ctx context.Context, phone string) (*models.Driver, error) {
 	query := `
 		SELECT
@@ -325,7 +316,7 @@ func (r *driverRepository) GetByPhone(ctx context.Context, phone string) (*model
 			fldPassportPhoto, fldPassportScan, fldAddress, fldExperienceYears,
 			fldStatus, fldCreatedAt, fldUpdatedAt
 		FROM drivers
-		WHERE fldPhone = $1
+		WHERE fldPhone = ?
 	`
 
 	driver := &models.Driver{}
@@ -358,7 +349,7 @@ func (r *driverRepository) GetByLicenseNumber(ctx context.Context, licenseNumber
 			fldPassportPhoto, fldPassportScan, fldAddress, fldExperienceYears,
 			fldStatus, fldCreatedAt, fldUpdatedAt
 		FROM drivers
-		WHERE fldDriverLicenseNumber = $1
+		WHERE fldDriverLicenseNumber = ?
 	`
 
 	driver := &models.Driver{}
@@ -391,7 +382,7 @@ func (r *driverRepository) GetByEmail(ctx context.Context, email string) (*model
 			fldPassportPhoto, fldPassportScan, fldAddress, fldExperienceYears,
 			fldStatus, fldCreatedAt, fldUpdatedAt
 		FROM drivers
-		WHERE fldEmail = $1
+		WHERE fldEmail = ?
 	`
 
 	driver := &models.Driver{}

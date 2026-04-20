@@ -1,10 +1,11 @@
 # Script to stop all services
 
+# Set window title
+$Host.UI.RawUI.WindowTitle = "Stop All Services"
+
 Write-Host "Stopping all services..." -ForegroundColor Yellow
-
-# Stop processes on ports 8080 and 5173
-$ports = @("8080", "5173")
-
+# Stop processes on ports 8082, 8081 and 5173
+$ports = @("8082", "8081", "5173")
 foreach ($port in $ports) {
     $portInUse = netstat -ano | Select-String ":$port" | Select-String "LISTENING"
     if ($portInUse) {
@@ -19,16 +20,6 @@ foreach ($port in $ports) {
     } else {
         Write-Host "Port $port is not in use." -ForegroundColor Gray
     }
-}
-
-# Ask if PostgreSQL should be stopped
-$stopPostgres = Read-Host "Stop PostgreSQL? (y/n)"
-if ($stopPostgres -eq "y" -or $stopPostgres -eq "Y") {
-    Write-Host "Stopping PostgreSQL..." -ForegroundColor Cyan
-    docker-compose down
-    Write-Host "PostgreSQL stopped." -ForegroundColor Green
-} else {
-    Write-Host "PostgreSQL continues running." -ForegroundColor Yellow
 }
 
 Write-Host ""
