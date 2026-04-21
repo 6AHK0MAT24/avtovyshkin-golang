@@ -338,4 +338,6 @@ func (v *Vehicle) UpdateVehicle(req *UpdateVehicleRequest) {
 	}
 	if req.MainImageIndex != nil {
 		v.MainImageIndex = *req.MainImageIndex
-	}	v.UpdatedAt = time.Now()}
+	}
+	v.UpdatedAt = time.Now()
+}

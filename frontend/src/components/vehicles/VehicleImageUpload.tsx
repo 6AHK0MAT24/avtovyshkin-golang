@@ -46,35 +46,29 @@ export const VehicleImageUpload: React.FC<VehicleImageUploadProps> = ({
     setCurrentMainIndex(initialMainIndex);
   }, [images, initialMainIndex]);
 
-  const validateFile = (file: File): boolean => {    console.log('Validating file:', file.name, file.type, file.size);
-    console.log('Allowed types:', allowedTypes);
-    console.log('Current previews length:', previews.length);
-    console.log('Max count:', maxCount);
-    
+  const validateFile = (file: File): boolean => {
     // Проверка типа файла
     if (!allowedTypes.includes(file.type)) {
-      console.log('File type not allowed');
       message.error('Допустимы только изображения (jpg, jpeg, png, gif, webp)');
       return false;
     }
 
     // Проверка размера файла
     if (file.size > maxSize) {
-      console.log('File size too large');
       message.error('Размер файла не должен превышать 10MB');
       return false;
     }
 
     // Проверка количества файлов
     if (previews.length >= maxCount) {
-      console.log('Max count reached');
       message.error(`Максимум ${maxCount} изображений`);
       return false;
     }
 
-    console.log('File validation passed');
     return true;
-  };  const handleFileSelect = (files: FileList | null) => {
+  };
+
+  const handleFileSelect = (files: FileList | null) => {
     if (!files) return;
 
     const validFiles: File[] = [];
@@ -96,37 +90,28 @@ export const VehicleImageUpload: React.FC<VehicleImageUploadProps> = ({
     }
   };
 
-  const handleDrop: UploadProps['customRequest'] = (options) => {
-    console.log('handleDrop called with options:', options);
-    const { file } = options;
-    console.log('File object:', file);
-    console.log('File instanceof File:', file instanceof File);
+  const handleDrop: UploadProps['customRequest'] = (options) => {    const { file } = options;
 
     if (file instanceof File) {
-      console.log('Processing file:', file.name, file.size, file.type);
-
       if (validateFile(file)) {
-        console.log('File validation passed');
         const url = URL.createObjectURL(file);
-        console.log('Created blob URL:', url);
 
         // Используем функциональное обновление состояния
         setPreviews(prevPreviews => {
           const newPreviews = [...prevPreviews, { url, file }];
-          console.log('New previews length after push:', newPreviews.length);
           handleChange(newPreviews, currentMainIndex);
           return newPreviews;
         });
-      } else {
-        console.log('File validation failed');
       }
     }
-  };  const handleSetMain = (index: number) => {
+  };
+
+  const handleSetMain = (index: number) => {
     setCurrentMainIndex(index);
     handleChange(previews, index);
   };
-  const handleRemove = (index: number) => {
-    const newPreviews = previews.filter((_, i) => i !== index);
+
+  const handleRemove = (index: number) => {    const newPreviews = previews.filter((_, i) => i !== index);
     
     // Корректируем индекс основного изображения
     let newMainIndex = currentMainIndex;
@@ -156,13 +141,15 @@ export const VehicleImageUpload: React.FC<VehicleImageUploadProps> = ({
       const userMainIndex = newMainIndex + 1;
       onChange(imageUrls, userMainIndex, filesToUpload);
     }
-  };  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {    handleFileSelect(e.target.files);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileSelect(e.target.files);
     // Сбрасываем input, чтобы можно было выбрать те же файлы снова
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  };
-  return (
+  };  return (
     <div>
       <Flex vertical gap="middle" style={{ width: '100%' }}>        {/* Drag & Drop зона */}
         {previews.length < maxCount && (

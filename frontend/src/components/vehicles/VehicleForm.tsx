@@ -79,35 +79,46 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess, on
       if (processedValues.special !== vehicle?.special) data.special = processedValues.special;
       if (processedValues.description !== vehicle?.description) data.description = processedValues.description;
 
-      // Пробуем отправить несколько полей, включая изображения
-      const testData: UpdateVehicleRequest = {
-        garageNumber: processedValues.garageNumber,
-        rostechReg: processedValues.rostechReg || false,
-        imgArray: cleanImgArray,
-        mainImageIndex: mainImageIndex - 1,
-      };
-      console.log('Отправляемые данные:', testData);
-      console.log('JSON данные:', JSON.stringify(testData, null, 2));
+      // Проверяем изменения в изображениях
+      const oldImgArray = (vehicle?.imgArray || []).map(img => {
+        if (img.startsWith('http://localhost:8081')) {
+          return img.replace('http://localhost:8081', '');
+        }
+        return img;
+      });
+      const oldMainIndex = vehicle?.mainImageIndex || 1;
+
+      // Сравниваем массивы изображений
+      const imagesChanged = JSON.stringify(oldImgArray) !== JSON.stringify(cleanImgArray);
+      const mainIndexChanged = oldMainIndex !== mainImageIndex;
+
+      if (imagesChanged) {
+        data.imgArray = cleanImgArray;
+      }
+      if (mainIndexChanged) {
+        data.mainImageIndex = mainImageIndex - 1;
+      }
 
       if (isEdit) {
         // При редактировании сначала обновляем данные автовышки
         try {
-          await updateVehicle.mutateAsync({ id: vehicle.id, data: testData });
+          await updateVehicle.mutateAsync({ id: vehicle.id, data });
+
+          // Загружаем новые изображения из pendingFiles
+          if (pendingFiles.length > 0) {
+            await uploadImages.mutateAsync({ id: vehicle.id, files: pendingFiles });
+          }
+
+          // Удаление старых изображений происходит через обновление массива imgArray
+          // Бэкенд сам обрабатывает разницу между старым и новым массивом
+          message.success('Автовышка успешно обновлена');
+          onSuccess();
         } catch (updateError: any) {
           console.error('Ошибка обновления:', updateError);
           console.error('Детали ошибки:', updateError.response?.data);
           console.error('Статус:', updateError.response?.status);
           throw updateError;
         }
-
-        // Загружаем новые изображения из pendingFiles
-        if (pendingFiles.length > 0) {
-          await uploadImages.mutateAsync({ id: vehicle.id, files: pendingFiles });
-        }
-
-        // Удаление старых изображений происходит через обновление массива imgArray
-        // Бэкенд сам обрабатывает разницу между старым и новым массивом
-        message.success('Автовышка успешно обновлена');
       } else {
         // При создании сначала создаем автовышку с данными
         const createData: CreateVehicleRequest = {
@@ -124,7 +135,8 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess, on
         }
 
         message.success('Автовышка успешно создана');
-      }      onSuccess();
+        onSuccess();
+      }
     } catch (error) {
       message.error(isEdit ? 'Ошибка при обновлении автовышки' : 'Ошибка при создании автовышки');
     }
@@ -136,8 +148,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess, on
     if (files) {
       setPendingFiles(files);
     }
-  };
-  return (
+  };  return (
     <Form
       form={form}
       layout="vertical"
