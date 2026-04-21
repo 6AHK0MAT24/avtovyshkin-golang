@@ -47,17 +47,17 @@ func NewVehicleService(repo repository.VehicleRepository) VehicleService {
 func (s *vehicleService) CreateVehicle(ctx context.Context, req *models.CreateVehicleRequest) (*models.Vehicle, error) {
 	// Validate VIN (17 characters, alphanumeric without I, O, Q)
 	if !utils.ValidateVIN(req.VIN) {
-		return nil, fmt.Errorf("invalid VIN format: must be 17 alphanumeric characters without I, O, Q")
+		return nil, fmt.Errorf("Неверный формат VIN: должен содержать 17 символов без I, O, Q")
 	}
 
 	// Validate garage number
 	if !utils.ValidateGarageNumber(req.GarageNumber) {
-		return nil, fmt.Errorf("invalid garage number format")
+		return nil, fmt.Errorf("Неверный формат гаражного номера")
 	}
 
 	// Validate height (> 0)
 	if req.Height <= 0 {
-		return nil, fmt.Errorf("height must be greater than 0")
+		return nil, fmt.Errorf("Высота должна быть больше 0")
 	}
 
 	// Validate type if provided
@@ -68,13 +68,13 @@ func (s *vehicleService) CreateVehicle(ctx context.Context, req *models.CreateVe
 			"Телескоп + стрела и рукоять": true,
 		}
 		if !validTypes[*req.Type] {
-			return nil, fmt.Errorf("invalid vehicle type: must be one of Телескопическая, Телескоп + колено, Телескоп + стрела и рукоять")
+			return nil, fmt.Errorf("Неверный тип автовышки: должен быть одним из: Телескопическая, Телескоп + колено, Телескоп + стрела и рукоять")
 		}
 	}
 
 	// Validate status if provided
 	if req.Status != nil && !req.Status.IsValid() {
-		return nil, fmt.Errorf("invalid vehicle status")
+		return nil, fmt.Errorf("Неверный статус автовышки")
 	}
 
 	// Check if garage number already exists
@@ -83,7 +83,7 @@ func (s *vehicleService) CreateVehicle(ctx context.Context, req *models.CreateVe
 		return nil, fmt.Errorf("failed to check existing vehicle: %w", err)
 	}
 	if existingVehicle != nil {
-		return nil, fmt.Errorf("vehicle with this garage number already exists")
+		return nil, fmt.Errorf("Автовышка с таким гаражным номером уже существует")
 	}
 
 	// Check if VIN already exists
@@ -92,9 +92,8 @@ func (s *vehicleService) CreateVehicle(ctx context.Context, req *models.CreateVe
 		return nil, fmt.Errorf("failed to check existing vehicle: %w", err)
 	}
 	if existingVehicle != nil {
-		return nil, fmt.Errorf("vehicle with this VIN already exists")
+		return nil, fmt.Errorf("Автовышка с таким VIN уже существует")
 	}
-
 	// Create vehicle
 	vehicle := req.ToVehicle()
 	vehicle.CreatedAt = time.Now()
@@ -142,21 +141,21 @@ func (s *vehicleService) UpdateVehicle(ctx context.Context, id uuid.UUID, req *m
 	vehicle, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get vehicle: %w", err)
-	}	// Validate VIN if provided
+	}
+	// Validate VIN if provided
 	if req.VIN != nil {
 		if !utils.ValidateVIN(*req.VIN) {
-			return nil, fmt.Errorf("invalid VIN format: must be 17 alphanumeric characters without I, O, Q")
+			return nil, fmt.Errorf("Неверный формат VIN: должен содержать 17 символов без I, O, Q")
 		}
 	}
-
 	// Validate garage number if provided
 	if req.GarageNumber != nil && !utils.ValidateGarageNumber(*req.GarageNumber) {
-		return nil, fmt.Errorf("invalid garage number format")
+		return nil, fmt.Errorf("Неверный формат гаражного номера")
 	}
 
 	// Validate height if provided
 	if req.Height != nil && *req.Height <= 0 {
-		return nil, fmt.Errorf("height must be greater than 0")
+		return nil, fmt.Errorf("Высота должна быть больше 0")
 	}
 
 	// Validate type if provided
@@ -167,19 +166,19 @@ func (s *vehicleService) UpdateVehicle(ctx context.Context, id uuid.UUID, req *m
 			"Телескоп + стрела и рукоять": true,
 		}
 		if !validTypes[*req.Type] {
-			return nil, fmt.Errorf("invalid vehicle type: must be one of Телескопическая, Телескоп + колено, Телескоп + стрела и рукоять")
+			return nil, fmt.Errorf("Неверный тип автовышки: должен быть одним из: Телескопическая, Телескоп + колено, Телескоп + стрела и рукоять")
 		}
 	}
 
 	// Validate status if provided
 	if req.Status != nil && !req.Status.IsValid() {
-		return nil, fmt.Errorf("invalid vehicle status")
+		return nil, fmt.Errorf("Неверный статус автовышки")
 	}
 
 	// Validate main image index if provided
 	if req.MainImageIndex != nil {
 		if *req.MainImageIndex < 0 {
-			return nil, fmt.Errorf("main image index must be non-negative")
+			return nil, fmt.Errorf("Индекс главного изображения должен быть неотрицательным")
 		}
 
 		// Проверяем индекс относительно НОВОГО массива, если он предоставлен
@@ -189,16 +188,17 @@ func (s *vehicleService) UpdateVehicle(ctx context.Context, id uuid.UUID, req *m
 		}
 
 		if imgArrayLen > 0 && *req.MainImageIndex >= imgArrayLen {
-			return nil, fmt.Errorf("main image index out of range: index %d, array length %d", *req.MainImageIndex, imgArrayLen)
+			return nil, fmt.Errorf("Индекс главного изображения вне диапазона: индекс %d, длина массива %d", *req.MainImageIndex, imgArrayLen)
 		}
-	}	// Check if garage number already exists (excluding current vehicle)
+	}
+	// Check if garage number already exists (excluding current vehicle)
 	if req.GarageNumber != nil && *req.GarageNumber != vehicle.GarageNumber {
 		existingVehicle, err := s.repo.GetByGarageNumber(ctx, *req.GarageNumber)
 		if err != nil {
 			return nil, fmt.Errorf("failed to check existing vehicle: %w", err)
 		}
 		if existingVehicle != nil && existingVehicle.ID != id {
-			return nil, fmt.Errorf("vehicle with this garage number already exists")
+			return nil, fmt.Errorf("Автовышка с таким гаражным номером уже существует")
 		}
 	}
 
@@ -209,10 +209,9 @@ func (s *vehicleService) UpdateVehicle(ctx context.Context, id uuid.UUID, req *m
 			return nil, fmt.Errorf("failed to check existing vehicle: %w", err)
 		}
 		if existingVehicle != nil && existingVehicle.ID != id {
-			return nil, fmt.Errorf("vehicle with this VIN already exists")
+			return nil, fmt.Errorf("Автовышка с таким VIN уже существует")
 		}
 	}
-
 	// Update vehicle
 	vehicle.UpdateVehicle(req)
 	vehicle.UpdatedAt = time.Now()

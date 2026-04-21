@@ -38,10 +38,13 @@ class ApiClient {
           localStorage.removeItem('auth_token');
           window.location.href = '/login';
         }
+        // Улучшенная обработка ошибок - добавляем текст ответа в error.response.data
+        if (error.response?.data === undefined && error.response?.request?.responseText) {
+          error.response.data = error.response.request.responseText;
+        }
         return Promise.reject(error);
       }
-    );
-  }  public get<T = any>(url: string, params?: any) {
+    );  }  public get<T = any>(url: string, params?: any) {
     return this.client.get<T>(url, { params });
   }
 
@@ -104,10 +107,13 @@ class VehiclesApiClient extends ApiClient {
           localStorage.removeItem('auth_token');
           window.location.href = '/login';
         }
+        // Улучшенная обработка ошибок - добавляем текст ответа в error.response.data
+        if (error.response?.data === undefined && error.response?.request?.responseText) {
+          error.response.data = error.response.request.responseText;
+        }
         return Promise.reject(error);
       }
-    );
-  }
+    );  }
 }
 
 export const vehiclesApiClient = new VehiclesApiClient();

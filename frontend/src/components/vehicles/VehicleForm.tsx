@@ -30,9 +30,14 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess, on
       setImgArray(vehicle.imgArray || []);
       // С сервера уже приходит 1-based индекс (конвертация в ToResponse)
       setMainImageIndex(vehicle.mainImageIndex || 1);
+    } else {
+      // Сбрасываем форму при создании новой автовышки
+      form.resetFields();
+      setImgArray([]);
+      setMainImageIndex(1);
+      setPendingFiles([]);
     }
   }, [vehicle, form]);
-
   const handleSubmit = async (values: any) => {
     try {
       // Конвертируем полные URL в относительные пути для отправки на сервер
@@ -137,10 +142,20 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess, on
         message.success('Автовышка успешно создана');
         onSuccess();
       }
-    } catch (error) {
-      message.error(isEdit ? 'Ошибка при обновлении автовышки' : 'Ошибка при создании автовышки');
-    }
-  };
+    } catch (error: any) {
+      // Извлекаем конкретное сообщение об ошибке от бэкенда
+      let errorMessage = isEdit ? 'Ошибка при обновлении автовышки' : 'Ошибка при создании автовышки';
+
+      if (error?.response?.data) {
+        // Если бэкенд вернул текст ошибки в теле ответа
+        errorMessage = error.response.data;
+      } else if (error?.message) {
+        // Если есть сообщение в объекте ошибки
+        errorMessage = error.message;
+      }
+
+      message.error(errorMessage);
+    }  };
 
   const handleImagesChange = (newImages: string[], newMainIndex: number, files?: File[]) => {
     setImgArray(newImages);

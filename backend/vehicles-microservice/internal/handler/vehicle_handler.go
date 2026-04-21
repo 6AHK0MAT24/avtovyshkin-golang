@@ -41,10 +41,9 @@ func NewVehicleHandler(service service.VehicleService, wsManager *websocket.Mana
 func (h *VehicleHandler) CreateVehicle(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateVehicleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Неверный формат запроса", http.StatusBadRequest)
 		return
 	}
-
 	vehicle, err := h.service.CreateVehicle(context.Background(), &req)
 	if err != nil {
 		log.Printf("Error creating vehicle: %v", err)
@@ -65,17 +64,16 @@ func (h *VehicleHandler) GetVehicle(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/vehicles/")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		http.Error(w, "Invalid vehicle ID", http.StatusBadRequest)
+		http.Error(w, "Неверный ID автовышки", http.StatusBadRequest)
 		return
 	}
 
 	vehicle, err := h.service.GetVehicle(context.Background(), id)
 	if err != nil {
 		log.Printf("Error getting vehicle: %v", err)
-		http.Error(w, "Vehicle not found", http.StatusNotFound)
+		http.Error(w, "Автовышка не найдена", http.StatusNotFound)
 		return
 	}
-
 	respondJSON(w, http.StatusOK, vehicle.ToResponse())
 }
 
@@ -95,10 +93,9 @@ func (h *VehicleHandler) GetVehicles(w http.ResponseWriter, r *http.Request) {
 	vehicles, total, err := h.service.GetVehicles(context.Background(), page, pageSize)
 	if err != nil {
 		log.Printf("Error getting vehicles: %v", err)
-		http.Error(w, "Failed to get vehicles", http.StatusInternalServerError)
+		http.Error(w, "Не удалось получить список автовышек", http.StatusInternalServerError)
 		return
 	}
-
 	// Convert to response format
 	vehicleResponses := make([]models.VehicleResponse, len(vehicles))
 	for i, vehicle := range vehicles {
@@ -120,16 +117,15 @@ func (h *VehicleHandler) UpdateVehicle(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/vehicles/")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		http.Error(w, "Invalid vehicle ID", http.StatusBadRequest)
+		http.Error(w, "Неверный ID автовышки", http.StatusBadRequest)
 		return
 	}
 
 	var req models.UpdateVehicleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Неверный формат запроса", http.StatusBadRequest)
 		return
 	}
-
 	vehicle, err := h.service.UpdateVehicle(context.Background(), id, &req)
 	if err != nil {
 		log.Printf("Error updating vehicle: %v", err)
@@ -150,7 +146,7 @@ func (h *VehicleHandler) DeleteVehicle(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/vehicles/")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		http.Error(w, "Invalid vehicle ID", http.StatusBadRequest)
+		http.Error(w, "Неверный ID автовышки", http.StatusBadRequest)
 		return
 	}
 
@@ -165,9 +161,8 @@ func (h *VehicleHandler) DeleteVehicle(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error broadcasting vehicle deleted event: %v", err)
 	}
 
-	respondJSON(w, http.StatusOK, map[string]string{"message": "Vehicle deleted successfully"})
+	respondJSON(w, http.StatusOK, map[string]string{"message": "Автовышка успешно удалена"})
 }
-
 // SearchVehicles handles GET /api/vehicles/search
 func (h *VehicleHandler) SearchVehicles(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("q")
@@ -184,10 +179,9 @@ func (h *VehicleHandler) SearchVehicles(w http.ResponseWriter, r *http.Request) 
 	vehicles, total, err := h.service.SearchVehicles(context.Background(), query, page, pageSize)
 	if err != nil {
 		log.Printf("Error searching vehicles: %v", err)
-		http.Error(w, "Failed to search vehicles", http.StatusInternalServerError)
+		http.Error(w, "Не удалось выполнить поиск автовышек", http.StatusInternalServerError)
 		return
 	}
-
 	// Convert to response format
 	vehicleResponses := make([]models.VehicleResponse, len(vehicles))
 	for i, vehicle := range vehicles {
@@ -210,20 +204,20 @@ func (h *VehicleHandler) UploadVehicleImages(w http.ResponseWriter, r *http.Requ
 	idStr = strings.TrimSuffix(idStr, "/images")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		http.Error(w, "Invalid vehicle ID", http.StatusBadRequest)
+		http.Error(w, "Неверный ID автовышки", http.StatusBadRequest)
 		return
 	}
 
 	// Parse multipart form
 	if err := r.ParseMultipartForm(h.uploadConfig.MaxUploadSize); err != nil {
-		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		http.Error(w, "Не удалось обработать форму", http.StatusBadRequest)
 		return
 	}
 
 	// Get all files from form
 	files := r.MultipartForm.File["files"]
 	if len(files) == 0 {
-		http.Error(w, "No files provided", http.StatusBadRequest)
+		http.Error(w, "Файлы не предоставлены", http.StatusBadRequest)
 		return
 	}
 
@@ -239,7 +233,7 @@ func (h *VehicleHandler) UploadVehicleImages(w http.ResponseWriter, r *http.Requ
 		// Validate file type
 		if !utils.ValidateFileType(fileHeader.Filename, h.uploadConfig.AllowedTypes) {
 			file.Close()
-			http.Error(w, "Invalid file type: "+fileHeader.Filename, http.StatusBadRequest)
+			http.Error(w, "Неверный тип файла: "+fileHeader.Filename, http.StatusBadRequest)
 			return
 		}
 
@@ -257,7 +251,7 @@ func (h *VehicleHandler) UploadVehicleImages(w http.ResponseWriter, r *http.Requ
 	}
 
 	if len(fileDataList) == 0 {
-		http.Error(w, "No valid files provided", http.StatusBadRequest)
+		http.Error(w, "Нет валидных файлов", http.StatusBadRequest)
 		return
 	}
 
@@ -270,9 +264,8 @@ func (h *VehicleHandler) UploadVehicleImages(w http.ResponseWriter, r *http.Requ
 	}
 
 	respondJSON(w, http.StatusOK, map[string]interface{}{
-		"message": "Images uploaded successfully",
-		"images":  imagePaths,
-	})
+		"message": "Изображения успешно загружены",
+		"images":  imagePaths,	})
 }
 
 // DeleteVehicleImage handles DELETE /api/vehicles/{id}/images/{index}
@@ -280,7 +273,7 @@ func (h *VehicleHandler) DeleteVehicleImage(w http.ResponseWriter, r *http.Reque
 	// Parse path: /api/vehicles/{id}/images/{index}
 	pathParts := strings.Split(r.URL.Path, "/")
 	if len(pathParts) < 6 {
-		http.Error(w, "Invalid path", http.StatusBadRequest)
+		http.Error(w, "Неверный путь", http.StatusBadRequest)
 		return
 	}
 
@@ -289,13 +282,13 @@ func (h *VehicleHandler) DeleteVehicleImage(w http.ResponseWriter, r *http.Reque
 
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		http.Error(w, "Invalid vehicle ID", http.StatusBadRequest)
+		http.Error(w, "Неверный ID автовышки", http.StatusBadRequest)
 		return
 	}
 
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {
-		http.Error(w, "Invalid image index", http.StatusBadRequest)
+		http.Error(w, "Неверный индекс изображения", http.StatusBadRequest)
 		return
 	}
 
@@ -305,16 +298,15 @@ func (h *VehicleHandler) DeleteVehicleImage(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	respondJSON(w, http.StatusOK, map[string]string{"message": "Image deleted successfully"})
+	respondJSON(w, http.StatusOK, map[string]string{"message": "Изображение успешно удалено"})
 }
-
 // SetMainImage handles PUT /api/vehicles/{id}/main-image
 func (h *VehicleHandler) SetMainImage(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/vehicles/")
 	idStr = strings.TrimSuffix(idStr, "/main-image")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		http.Error(w, "Invalid vehicle ID", http.StatusBadRequest)
+		http.Error(w, "Неверный ID автовышки", http.StatusBadRequest)
 		return
 	}
 
@@ -322,13 +314,13 @@ func (h *VehicleHandler) SetMainImage(w http.ResponseWriter, r *http.Request) {
 		Index int `json:"index"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Неверный формат запроса", http.StatusBadRequest)
 		return
 	}
 
 	// Индекс уже 1-based, используем как есть
 	if req.Index < 1 {
-		http.Error(w, "Invalid image index", http.StatusBadRequest)
+		http.Error(w, "Неверный индекс изображения", http.StatusBadRequest)
 		return
 	}
 
@@ -338,5 +330,5 @@ func (h *VehicleHandler) SetMainImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondJSON(w, http.StatusOK, map[string]string{"message": "Main image set successfully"})
+	respondJSON(w, http.StatusOK, map[string]string{"message": "Главное изображение успешно установлено"})
 }
