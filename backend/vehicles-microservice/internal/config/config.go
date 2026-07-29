@@ -26,7 +26,6 @@ type DatabaseConfig struct {
 	User     string
 	Password string
 	DBName   string
-	SSLMode  string
 }
 
 type ServerConfig struct {
@@ -66,11 +65,10 @@ func Load() *Config {
 	return &Config{
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
-			Port:     getEnv("DB_PORT", "5432"),
-			User:     getEnv("DB_USER", "postgres"),
-			Password: getEnv("DB_PASSWORD", "postgres"),
+			Port:     getEnv("DB_PORT", "3306"),
+			User:     getEnv("DB_USER", "avtovyshkin_db_go"),
+			Password: getEnv("DB_PASSWORD", "avtovyshkin_db_go_admin"),
 			DBName:   getEnv("DB_NAME", "avtovyshkin_db_go"),
-			SSLMode:  getEnv("DB_SSLMODE", "disable"),
 		},
 		Server: ServerConfig{
 			Port:         getEnv("SERVER_PORT", "8081"), // Changed from 8080 to 8081
@@ -80,7 +78,7 @@ func Load() *Config {
 			IdleTimeout:  getDurationEnv("IDLE_TIMEOUT", 60*time.Second),
 		},
 		Upload: UploadConfig{
-			Dir:           getEnv("UPLOAD_DIR", "./uploads/cars"), // Changed to cars directory
+			Dir:           getEnv("UPLOAD_DIR", "./uploads/cars"),   // Changed to cars directory
 			MaxUploadSize: getInt64Env("MAX_UPLOAD_SIZE", 10485760), // 10MB
 			AllowedTypes:  []string{"jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff", "svg", "pdf"},
 		},

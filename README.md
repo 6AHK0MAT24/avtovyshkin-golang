@@ -105,13 +105,12 @@ avtovyshkin-golang/
 
 ### Локальная разработка
 
-#### Рекомендуемый режим разработки (PostgreSQL в Docker + Hot Reload)
+#### Рекомендуемый режим разработки (MySQL + Hot Reload)
 
-Для локальной разработки рекомендуется использовать PostgreSQL в Docker с hot reload для микросервисов:
+Для локальной разработки рекомендуется использовать MySQL с hot reload для микросервисов:
 
 ```powershell
-# 1. Запуск PostgreSQL в Docker
-.\start-dev.ps1
+# 1. Запуск MySQL (убедитесь, что MySQL сервер запущен)
 
 # 2. Запуск Drivers Service с hot reload (в новом терминале)
 .\start-backend.ps1
@@ -119,15 +118,15 @@ avtovyshkin-golang/
 # 3. Запуск Vehicles Service с hot reload (в новом терминале)
 .\start-vehicles.ps1
 
-# 4. Запуск фронтенда (в новом терминале)
-.\start-frontend.ps1
+# 4. Запуск Clients Service с hot reload (в новом терминале)
+.\start-clients.ps1
 
-# Остановка PostgreSQL
-.\stop-dev.ps1
+# 5. Запуск фронтенда (в новом терминале)
+.\start-frontend.ps1
 ```
 
 **Преимущества этого режима:**
-- ✅ PostgreSQL работает в Docker (изолирован и легко управляем)
+- ✅ MySQL работает локально (изолирован и легко управляем)
 - ✅ Микросервисы запускаются локально с hot reload (изменения применяются автоматически)
 - ✅ Быстрый цикл разработки без пересборки Docker контейнеров
 - ✅ Полный доступ к отладке и логам
@@ -137,7 +136,7 @@ avtovyshkin-golang/
 Для удобного запуска проекта используйте готовые скрипты:
 
 ```powershell
-# Запуск всего проекта (PostgreSQL + Backend + Frontend)
+# Запуск всего проекта (Backend + Frontend)
 .\start-all.ps1
 
 # Запуск только Backend

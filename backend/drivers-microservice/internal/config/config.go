@@ -9,14 +9,15 @@ import (
 
 	"github.com/joho/godotenv"
 )
+
 type Config struct {
-	Database DatabaseConfig
-	Server   ServerConfig
-	Upload   UploadConfig
+	Database  DatabaseConfig
+	Server    ServerConfig
+	Upload    UploadConfig
 	WebSocket WebSocketConfig
-	CORS     CORSConfig
-	Env      string
-	LogLevel string
+	CORS      CORSConfig
+	Env       string
+	LogLevel  string
 }
 
 type DatabaseConfig struct {
@@ -25,7 +26,6 @@ type DatabaseConfig struct {
 	User     string
 	Password string
 	DBName   string
-	SSLMode  string
 }
 
 type ServerConfig struct {
@@ -37,9 +37,9 @@ type ServerConfig struct {
 }
 
 type UploadConfig struct {
-	Dir            string
-	MaxUploadSize  int64
-	AllowedTypes   []string
+	Dir           string
+	MaxUploadSize int64
+	AllowedTypes  []string
 }
 
 type WebSocketConfig struct {
@@ -65,11 +65,10 @@ func Load() *Config {
 	return &Config{
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
-			Port:     getEnv("DB_PORT", "5432"),
-			User:     getEnv("DB_USER", "postgres"),
-			Password: getEnv("DB_PASSWORD", "postgres"),
+			Port:     getEnv("DB_PORT", "3306"),
+			User:     getEnv("DB_USER", "avtovyshkin_db_go"),
+			Password: getEnv("DB_PASSWORD", "avtovyshkin_db_go_admin"),
 			DBName:   getEnv("DB_NAME", "avtovyshkin_db_go"),
-			SSLMode:  getEnv("DB_SSLMODE", "disable"),
 		},
 		Server: ServerConfig{
 			Port:         getEnv("SERVER_PORT", "8080"),
@@ -82,7 +81,7 @@ func Load() *Config {
 			Dir:           getEnv("UPLOAD_DIR", "./uploads"),
 			MaxUploadSize: getInt64Env("MAX_UPLOAD_SIZE", 10485760), // 10MB
 			AllowedTypes:  []string{"jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff", "svg", "pdf"},
-		},		WebSocket: WebSocketConfig{
+		}, WebSocket: WebSocketConfig{
 			ReadBufferSize:  getIntEnv("WS_READ_BUFFER_SIZE", 1024),
 			WriteBufferSize: getIntEnv("WS_WRITE_BUFFER_SIZE", 1024),
 			PingPeriod:      getDurationEnv("WS_PING_PERIOD", 54*time.Second),
@@ -93,7 +92,7 @@ func Load() *Config {
 			AllowedOrigins: getSliceEnv("CORS_ALLOWED_ORIGINS", []string{"http://localhost:5173", "http://localhost:3000"}),
 			AllowedMethods: getSliceEnv("CORS_ALLOWED_METHODS", []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
 			AllowedHeaders: getSliceEnv("CORS_ALLOWED_HEADERS", []string{"Content-Type", "Authorization", "X-Requested-With"}),
-		},		Env:      getEnv("ENV", "development"),
+		}, Env: getEnv("ENV", "development"),
 		LogLevel: getEnv("LOG_LEVEL", "debug"),
 	}
 }

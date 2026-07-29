@@ -23,9 +23,9 @@ if (-not (Test-Path "node_modules")) {
 $portInUse = netstat -ano | Select-String ":5173" | Select-String "LISTENING"
 if ($portInUse) {
     Write-Host "Warning: Port 5173 is already in use. Attempting to free it..." -ForegroundColor Yellow
-    $pid = ($portInUse -split '\s+')[-1]
+    $processId = ($portInUse -split '\s+')[-1]
     try {
-        taskkill /F /PID $pid | Out-Null
+        taskkill /F /PID $processId | Out-Null
         Write-Host "Port 5173 freed." -ForegroundColor Green
     } catch {
         Write-Host "Failed to free port 5173. Please stop the process manually." -ForegroundColor Red
